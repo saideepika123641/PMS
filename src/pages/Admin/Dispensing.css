@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 24px;
   width: 100%;
+  margin-top: 20px;
 }
 
 /* Page Header */
@@ -107,72 +108,91 @@
   color: #0f172a;
 }
 
-/* Workflow tab buttons */
-.dispense-workflow-tabs {
+/* Workflow Tab Cards Grid (Spaced Cards) */
+.dispense-workflow-cards-grid {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.dispense-workflow-card {
+  background: #ffffff;
+  border: 1px solid var(--card-border, #e2e8f0);
+  border-radius: 14px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
 }
 
-.dispense-tab-btn {
-  height: 42px;
-  padding: 0 18px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 600;
+.dispense-workflow-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.06);
+  border-color: var(--card-accent, #2563eb);
+}
+
+.dispense-card-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--card-bg, #eff6ff);
+  color: var(--card-accent, #2563eb);
   display: flex;
   align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid #dbeafe;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
 
-/* Active State */
-.dispense-tab-btn.is-active {
-  background: #2563eb !important;
+.dispense-workflow-card:hover .dispense-card-icon-wrap {
+  transform: scale(1.08);
+}
+
+.dispense-card-icon-wrap svg {
+  width: 18px;
+  height: 18px;
+}
+
+.dispense-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dispense-card-text span {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.dispense-card-text small {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* Active Workflow Card State */
+.dispense-workflow-card.active {
+  background: var(--card-accent, #2563eb) !important;
+  border-color: var(--card-accent, #2563eb) !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
+}
+
+.dispense-workflow-card.active .dispense-card-icon-wrap {
+  background: rgba(255, 255, 255, 0.2) !important;
   color: #ffffff !important;
-  border-color: #2563eb !important;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
 }
 
-/* Inactive State */
-.dispense-tab-btn.is-normal {
-  background: #eff6ff;
-  color: #2563eb;
-}
-
-.dispense-tab-btn.is-normal:hover {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-/* Success / Payment tab state */
-.dispense-tab-btn.is-payment {
-  background: #ecfdf5;
-  color: #059669;
-  border-color: #a7f3d0;
-}
-
-.dispense-tab-btn.is-payment:hover {
-  background: #d1fae5;
-  color: #047857;
-}
-
-.dispense-tab-btn.is-payment.is-active {
-  background: #10b981 !important;
+.dispense-workflow-card.active .dispense-card-text span,
+.dispense-workflow-card.active .dispense-card-text small {
   color: #ffffff !important;
-  border-color: #10b981 !important;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15) !important;
-}
-
-.dispense-tab-btn svg {
-  width: 15px;
-  height: 15px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
 }
 
 /* Billing Summary Section */
@@ -180,40 +200,78 @@
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
+  align-items: stretch;
+  width: 100%;
 }
 
 .dispense-summary-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 16px;
+  border: 1px solid var(--card-border, #e2e8f0);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 88px;
+}
+
+.dispense-summary-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+}
+
+.dispense-summary-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--card-bg, #eff6ff);
+  color: var(--card-accent, #2563eb);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.dispense-summary-card:hover .dispense-summary-icon-wrap {
+  transform: scale(1.08);
+}
+
+.dispense-summary-icon-wrap svg {
+  width: 22px;
+  height: 22px;
+}
+
+.dispense-summary-info {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  gap: 2px;
 }
 
 .dispense-summary-card label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #94a3b8;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .dispense-summary-card span {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   color: #0f172a;
+  line-height: 1.1;
 }
 
 /* Table results container */
 .dispense-table-panel {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border-radius: 18px;
   padding: 20px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .dispense-table-panel h2 {

@@ -436,27 +436,74 @@ export default function StockTransfers() {
             </button>
           </div>
 
-          {/* Summary Cards */}
+          {/* Summary Cards (5 Equal Sized Cards) */}
           <div className="transfer-summary-grid">
-            <div className="transfer-summary-card">
-              <label>Total Transfers</label>
-              <span>{summary.total}</span>
+            <div className="transfer-summary-card" style={{ '--card-accent': '#2563eb', '--card-bg': '#eff6ff', '--card-border': 'rgba(37, 99, 235, 0.2)' }}>
+              <div className="transfer-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="17 1 21 5 17 9"/>
+                  <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+                  <polyline points="7 23 3 19 7 15"/>
+                  <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+                </svg>
+              </div>
+              <div className="transfer-summary-info">
+                <label>Total Transfers</label>
+                <span>{summary.total}</span>
+              </div>
             </div>
-            <div className="transfer-summary-card" style={{ borderLeft: '3px solid #f59e0b' }}>
-              <label style={{ color: '#f59e0b' }}>Pending Transfers</label>
-              <span style={{ color: '#f59e0b' }}>{summary.pending}</span>
+
+            <div className="transfer-summary-card" style={{ '--card-accent': '#f59e0b', '--card-bg': '#fef3c7', '--card-border': 'rgba(245, 158, 11, 0.2)' }}>
+              <div className="transfer-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div className="transfer-summary-info">
+                <label>Pending Transfers</label>
+                <span>{summary.pending}</span>
+              </div>
             </div>
-            <div className="transfer-summary-card" style={{ borderLeft: '3px solid #2563eb' }}>
-              <label style={{ color: '#2563eb' }}>Dispatched</label>
-              <span style={{ color: '#2563eb' }}>{summary.dispatched}</span>
+
+            <div className="transfer-summary-card" style={{ '--card-accent': '#0ea5e9', '--card-bg': '#e0f2fe', '--card-border': 'rgba(14, 165, 233, 0.2)' }}>
+              <div className="transfer-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="13 17 18 12 13 7"/>
+                  <line x1="6" y1="12" x2="18" y2="12"/>
+                </svg>
+              </div>
+              <div className="transfer-summary-info">
+                <label>Dispatched</label>
+                <span>{summary.dispatched}</span>
+              </div>
             </div>
-            <div className="transfer-summary-card" style={{ borderLeft: '3px solid #10b981' }}>
-              <label style={{ color: '#10b981' }}>Received</label>
-              <span style={{ color: '#10b981' }}>{summary.received}</span>
+
+            <div className="transfer-summary-card" style={{ '--card-accent': '#10b981', '--card-bg': '#ecfdf5', '--card-border': 'rgba(16, 185, 129, 0.2)' }}>
+              <div className="transfer-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div className="transfer-summary-info">
+                <label>Received</label>
+                <span>{summary.received}</span>
+              </div>
             </div>
-            <div className="transfer-summary-card" style={{ borderLeft: '3px solid #ef4444' }}>
-              <label style={{ color: '#ef4444' }}>Cancelled</label>
-              <span style={{ color: '#ef4444' }}>{summary.cancelled}</span>
+
+            <div className="transfer-summary-card" style={{ '--card-accent': '#ef4444', '--card-bg': '#fee2e2', '--card-border': 'rgba(239, 68, 68, 0.2)' }}>
+              <div className="transfer-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+              </div>
+              <div className="transfer-summary-info">
+                <label>Cancelled</label>
+                <span>{summary.cancelled}</span>
+              </div>
             </div>
           </div>
 

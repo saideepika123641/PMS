@@ -27,9 +27,10 @@ function AdminLayout({ activeLabel, title, subtitle, children }) {
   const [showResults, setShowResults] = useState(false)
   const user = readStoredValue('pharmacyAdminUser') || {}
   const assignment = readStoredValue('pharmacyAdminAssignment') || {}
-  const adminName = user?.name || user?.fullName || user?.email || 'Admin'
+  const adminName = user?.name || user?.fullName || user?.email || 'Pilla Durga Prasad'
   const hospitalName = assignment?.hospitalName || assignment?.hospital?.name || assignment?.clinicName || assignment?.clinic?.name || 'Hospital'
   const branchName = assignment?.branchName || assignment?.branch?.name || assignment?.pharmacyName || assignment?.pharmacy?.name || 'Branch'
+  
   const results = useMemo(() => {
     const value = query.trim().toLowerCase()
     if (!value) return adminNavigation
@@ -53,7 +54,10 @@ function AdminLayout({ activeLabel, title, subtitle, children }) {
 
       <main className="branch-admin-main">
         <header className="branch-admin-header">
-          <button className="branch-admin-menu" type="button" onClick={() => setOpen(!open)}><Icon><path d="M4 6h16M4 12h16M4 18h16" /></Icon></button>
+          <button className="branch-admin-menu" type="button" onClick={() => setOpen(!open)}>
+            <Icon><path d="M4 6h16M4 12h16M4 18h16" /></Icon>
+          </button>
+          
           <form
             className="branch-admin-top-search"
             onSubmit={submitSearch}
@@ -69,6 +73,7 @@ function AdminLayout({ activeLabel, title, subtitle, children }) {
               onFocus={() => setShowResults(true)}
               placeholder="Search dashboard, medicines, users, reports..."
             />
+            <span className="search-shortcut-badge">⌘ K</span>
             {showResults ? (
               <div className="branch-admin-search-results">
                 {results.length ? results.slice(0, 7).map((item) => (
@@ -79,8 +84,14 @@ function AdminLayout({ activeLabel, title, subtitle, children }) {
               </div>
             ) : null}
           </form>
-          <button className="branch-admin-notification" type="button" aria-label="Notifications"><Icon><path d="M6 9a6 6 0 0 1 12 0c0 7 2 7 2 9H4c0-2 2-2-2-9" /><path d="M10 21h4" /></Icon></button>
-          <UserProfileMenu roleType="pharmacy-admin" />
+
+          <div className="header-right-actions">
+            <button className="branch-admin-notification" type="button" aria-label="Notifications" title="Notifications">
+              <Icon><path d="M6 9a6 6 0 0 1 12 0c0 7 2 7 2 9H4c0-2 2-2-2-9" /><path d="M10 21h4" /></Icon>
+              <b className="unread-dot" />
+            </button>
+            <UserProfileMenu roleType="pharmacy-admin" />
+          </div>
         </header>
 
         <div className={`branch-admin-content${activeLabel === 'Dashboard' ? ' is-dashboard' : ''}`}>

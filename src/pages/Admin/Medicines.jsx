@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useToast } from '../../components/ToastProvider'
+import MedicineSuccessAnimation from '../../components/MedicineSuccessAnimation'
 import AdminLayout from './AdminLayout'
 import { 
   createMedicine,
@@ -23,16 +24,21 @@ const emptyForm = {
   name: '',
   genericName: '',
   code: '',
+  brandName: '',
   category: '',
   dosageForm: '',
   strength: '',
   unit: '',
+  packSize: '',
+  manufacturer: '',
+  purchasePrice: '',
   price: '',
+  gst: '',
   stock: '',
   minStock: '',
   maxStock: '',
   reorderLevel: '',
-  manufacturer: '',
+  expiryDate: '',
   prescriptionRequired: 'No',
   status: 'Active',
   notes: ''
@@ -96,6 +102,7 @@ export default function Medicines() {
   const [formOpen, setFormOpen] = useState(false)
   const [viewingItem, setViewineItem] = useState(null)
   const [importOpen, setImportOpen] = useState(false)
+  const [showSuccessAnim, setShowSuccessAnim] = useState(false)
   
   const [form, setForm] = useState(emptyForm)
 
@@ -157,6 +164,22 @@ export default function Medicines() {
       const reorderNum = Number(reorderStr)
       if (isNaN(reorderNum) || reorderNum < 0 || !Number.isInteger(reorderNum)) {
         errs.reorderLevel = 'Reorder level must be a whole number (0 or greater).'
+      }
+    }
+
+    const purchaseStr = String(form.purchasePrice ?? '').trim()
+    if (purchaseStr) {
+      const purchaseNum = Number(purchaseStr)
+      if (isNaN(purchaseNum) || purchaseNum < 0) {
+        errs.purchasePrice = 'Purchase Price must be 0 or greater.'
+      }
+    }
+
+    const gstStr = String(form.gst ?? '').trim()
+    if (gstStr) {
+      const gstNum = Number(gstStr)
+      if (isNaN(gstNum) || gstNum < 0 || gstNum > 100) {
+        errs.gst = 'GST % must be between 0 and 100.'
       }
     }
 
@@ -276,63 +299,133 @@ export default function Medicines() {
     setForm({
       name: getName(medicine),
       genericName: medicine?.genericName || '',
-      code: medicine?.code || '',
+      code: medicine?.code || medicine?.medicineCode || '',
+      brandName: medicine?.brandName || '',
       category: getCategory(medicine) === '-' ? '' : getCategory(medicine),
       dosageForm: getDosageForm(medicine) === '-' ? '' : getDosageForm(medicine),
       strength: medicine?.strength || '',
       unit: medicine?.unit || '',
-      price: medicine?.price || medicine?.mrp || '',
-      stock: medicine?.stock || medicine?.quantity || '',
+      packSize: medicine?.packSize || '',
+      manufacturer: medicine?.manufacturer || '',
+      purchasePrice: medicine?.purchasePrice !== undefined && medicine?.purchasePrice !== null ? String(medicine.purchasePrice) : '',
+      price: medicine?.sellingPrice || medicine?.price || medicine?.mrp || '',
+      gst: medicine?.gst !== undefined && medicine?.gst !== null ? String(medicine.gst) : '',
+      stock: medicine?.stockQuantity !== undefined ? String(medicine.stockQuantity) : (medicine?.stock || medicine?.quantity || ''),
       minStock: medicine?.minStock || medicine?.minimumStock || '',
       maxStock: medicine?.maxStock || medicine?.maximumStock || '',
       reorderLevel: medicine?.reorderLevel || '',
-      manufacturer: medicine?.manufacturer || '',
-      prescriptionRequired: medicine?.prescriptionRequired || 'No',
+      expiryDate: medicine?.expiryDate ? String(medicine.expiryDate).split('T')[0] : '',
+      prescriptionRequired: medicine?.prescriptionRequired === true || medicine?.prescriptionRequired === 'Yes' ? 'Yes' : 'No',
       status: getStatus(medicine),
-      notes: medicine?.notes || ''
+      notes: medicine?.description || medicine?.notes || ''
     })
     setFormOpen(true)
   }
 
   async function handleSave(event) {
+
     event.preventDefault()
+ 
     if (!validateForm()) return
+ 
     setSavine(true)
+ 
     const payload = {
-      name: form.name,
-      medicineName: form.name,
-      genericName: form.genericName || undefined,
-      code: form.code || undefined,
-      category: form.category,
-      dosageForm: form.dosageForm,
-      strength: form.strength,
-      unit: form.unit,
-      price: form.price === '' ? undefined : Number(form.price),
-      stock: form.stock === '' ? undefined : Number(form.stock),
+      name: form.name?.trim(),
+      medicineName: form.name?.trim(),
+      genericName: form.genericName?.trim() || undefined,
+      code: form.code?.trim() || undefined,
+      medicineCode: form.code?.trim() || undefined,
+      brandName: form.brandName?.trim() || undefined,
+      category: form.category?.trim(),
+      dosageForm: form.dosageForm?.trim(),
+      strength: form.strength?.trim() || undefined,
+      unit: form.unit?.trim() || undefined,
+      packSize: form.packSize?.trim() || undefined,
+      manufacturer: form.manufacturer?.trim() || undefined,
+      stockQuantity: form.stock === '' ? 0 : Number(form.stock),
+      stock: form.stock === '' ? 0 : Number(form.stock),
+      purchasePrice: form.purchasePrice === '' ? 0 : Number(form.purchasePrice),
+      sellingPrice: form.price === '' ? 0 : Number(form.price),
+      price: form.price === '' ? 0 : Number(form.price),
+      gst: form.gst === '' ? 0 : Number(form.gst),
+      expiryDate: form.expiryDate || null,
+      isActive: form.status === 'Active',
+      status: form.status,
+      prescriptionRequired: form.prescriptionRequired === 'Yes' || form.prescriptionRequired === true,
+      description: form.notes?.trim() || undefined,
+      notes: form.notes?.trim() || undefined,
       minStock: form.minStock === '' ? undefined : Number(form.minStock),
       maxStock: form.maxStock === '' ? undefined : Number(form.maxStock),
-      reorderLevel: form.reorderLevel === '' ? undefined : Number(form.reorderLevel),
-      manufacturer: form.manufacturer || undefined,
-      prescriptionRequired: form.prescriptionRequired,
-      status: form.status,
-      notes: form.notes || undefined
+      reorderLevel: form.reorderLevel === '' ? undefined : Number(form.reorderLevel)
+    }
+ 
+    console.log('MEDICINE PAYLOAD:', payload)
+ 
+    try {
+
+        const isCreate = !editing
+ 
+        const response = editing
+
+            ? await updateMedicine(getId(editing), payload)
+
+            : await createMedicine(payload)
+ 
+        setFormOpen(false)
+
+        setEditine(null)
+
+        setForm(emptyForm)
+
+        setFormErrors({})
+ 
+        await loadMedicines()
+
+        loadSummaryMetrics()
+ 
+        if (isCreate) {
+
+            setShowSuccessAnim(true)
+
+        } else {
+
+            showToast(
+
+                response?.message || 'Medicine updated successfully.'
+
+            )
+
+        }
+
+    } catch (error) {
+
+        console.error('MEDICINE SAVE ERROR:', error)
+
+        console.error('BACKEND RESPONSE:', error.response?.data)
+ 
+        showToast(
+
+            error.response?.data?.message ||
+
+            error.response?.data?.title ||
+
+            error.message ||
+
+            'Request failed. Please try again.',
+
+            'error'
+
+        )
+
+    } finally {
+
+        setSavine(false)
+
     }
 
-    try {
-      const response = editing ? await updateMedicine(getId(editing), payload) : await createMedicine(payload)
-      showToast(response?.message || `Medicine ${editing ? 'updated' : 'created'} successfully.`)
-      setFormOpen(false)
-      setEditine(null)
-      setForm(emptyForm)
-      setFormErrors({})
-      await loadMedicines()
-      loadSummaryMetrics()
-    } catch (error) {
-      showToast(error.message, 'error')
-    } finally {
-      setSavine(false)
-    }
-  }
+}
+ 
 
   async function handleDelete(medicine) {
     if (!window.confirm(`Are you sure you want to delete ${getName(medicine)}? This cannot be undone.`)) return
@@ -695,247 +788,498 @@ export default function Medicines() {
             )}
           </section>
 
-          {/* Modal 1: Add/Edit Medicine */}
+          {/* Modal 1: Add/Edit Medicine (Redesigned) */}
           {formOpen && (
             <div className="med-modal-overlay">
-              <form onSubmit={handleSave} className="med-modal-container" noValidate>
-                <div className="med-modal-header">
-                  <h2>{editing ? 'Update Medicine Profile' : '+ Add New Medicine'}</h2>
-                  <button type="button" className="med-modal-close" onClick={() => setFormOpen(false)}>&times;</button>
+              <form onSubmit={handleSave} className="med-modal-container med-modal-redesign" noValidate>
+                
+                {/* Sticky Header */}
+                <div className="med-modal-header-redesign">
+                  <div className="med-modal-header-title">
+                    <div className="med-header-badge">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="m10.5 11.5 5 5m-2.5-9L8 12.5a4.24 4.24 0 0 0 6 6l5-5a4.24 4.24 0 0 0-6-6Z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2>{editing ? 'Update Medicine Profile' : '+ Add New Medicine'}</h2>
+                      <p>{editing ? 'Modify existing medicine details and inventory properties' : 'Create and configure a medicine record for hospital inventory'}</p>
+                    </div>
+                  </div>
+                  <button type="button" className="med-modal-close-btn" onClick={() => setFormOpen(false)} aria-label="Close">
+                    &times;
+                  </button>
                 </div>
-                <div className="med-modal-body">
-                  <h3 style={{ margin: '0 0 4px', fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>Basic Information</h3>
-                  <div className="med-detail-row">
-                    <div className="med-form-group">
-                      <label>Medicine Name *</label>
-                      <input 
-                        type="text" 
-                        id="med-name"
-                        value={form.name} 
-                        onChange={(e) => {
-                          setForm({...form, name: e.target.value})
-                          if (formErrors.name) setFormErrors({...formErrors, name: ''})
-                        }} 
-                        style={formErrors.name ? { borderColor: '#ef4444' } : {}}
-                        required 
-                      />
-                      {formErrors.name && (
-                        <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{formErrors.name}</span>
-                      )}
-                    </div>
-                    <div className="med-form-group">
-                      <label>Generic Name *</label>
-                      <input 
-                        type="text" 
-                        id="med-genericName"
-                        value={form.genericName} 
-                        onChange={(e) => {
-                          setForm({...form, genericName: e.target.value})
-                          if (formErrors.genericName) setFormErrors({...formErrors, genericName: ''})
-                        }} 
-                        style={formErrors.genericName ? { borderColor: '#ef4444' } : {}}
-                        required
-                      />
-                      {formErrors.genericName && (
-                        <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{formErrors.genericName}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="med-detail-row">
-                    <div className="med-form-group">
-                      <label>Medicine Code</label>
-                      <input 
-                        type="text" 
-                        id="med-code"
-                        value={form.code} 
-                        onChange={(e) => setForm({...form, code: e.target.value})} 
-                      />
-                    </div>
-                    <div className="med-form-group">
-                      <label>Category *</label>
-                      <input 
-                        list="med-categories-list" 
-                        id="med-category"
-                        value={form.category} 
-                        onChange={(e) => {
-                          setForm({...form, category: e.target.value})
-                          if (formErrors.category) setFormErrors({...formErrors, category: ''})
-                        }} 
-                        style={formErrors.category ? { borderColor: '#ef4444' } : {}}
-                        required 
-                      />
-                      <datalist id="med-categories-list">
-                        {categories.map((item) => <option value={optionValue(item)} key={optionValue(item)} />)}
-                      </datalist>
-                      {formErrors.category && (
-                        <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{formErrors.category}</span>
-                      )}
-                    </div>
-                  </div>
 
-                  <h3 style={{ margin: '8px 0 4px', fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>Dosage & Packing</h3>
-                  <div className="med-detail-row">
-                    <div className="med-form-group">
-                      <label>Dosage Form *</label>
-                      <input 
-                        list="med-dosage-list" 
-                        id="med-dosageForm"
-                        value={form.dosageForm} 
-                        onChange={(e) => {
-                          setForm({...form, dosageForm: e.target.value})
-                          if (formErrors.dosageForm) setFormErrors({...formErrors, dosageForm: ''})
-                        }} 
-                        style={formErrors.dosageForm ? { borderColor: '#ef4444' } : {}}
-                        required 
-                      />
-                      <datalist id="med-dosage-list">
-                        {dosageForms.map((item) => <option value={optionValue(item)} key={optionValue(item)} />)}
-                      </datalist>
-                      {formErrors.dosageForm && (
-                        <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{formErrors.dosageForm}</span>
-                      )}
-                    </div>
-                    <div className="med-form-group">
-                      <label>Strength (e.g. 500mg)</label>
-                      <input 
-                        list="med-strengths-list" 
-                        id="med-strength"
-                        value={form.strength} 
-                        onChange={(e) => setForm({...form, strength: e.target.value})} 
-                      />
-                      <datalist id="med-strengths-list">
-                        {strengths.map((item) => <option value={optionValue(item)} key={optionValue(item)} />)}
-                      </datalist>
-                    </div>
-                  </div>
-                  <div className="med-detail-row">
-                    <div className="med-form-group">
-                      <label>Unit (e.g. tablet, vial)</label>
-                      <input 
-                        type="text" 
-                        id="med-unit"
-                        value={form.unit} 
-                        onChange={(e) => setForm({...form, unit: e.target.value})} 
-                      />
-                    </div>
-                    <div className="med-form-group">
-                      <label>Manufacturer</label>
-                      <input 
-                        type="text" 
-                        id="med-manufacturer"
-                        value={form.manufacturer} 
-                        onChange={(e) => setForm({...form, manufacturer: e.target.value})} 
-                      />
-                    </div>
-                  </div>
-
-                  <h3 style={{ margin: '8px 0 4px', fontSize: '13px', color: '#1e293b', fontWeight: 600 }}>Pricing & Thresholds</h3>
-                  <div className="med-detail-row">
-                    <div className="med-form-group">
-                      <label>Selling Price (₹) *</label>
-                      <input 
-                        type="number" 
-                        id="med-price"
-                        value={form.price} 
-                        onChange={(e) => {
-                          setForm({...form, price: e.target.value})
-                          if (formErrors.price) setFormErrors({...formErrors, price: ''})
-                        }} 
-                        style={formErrors.price ? { borderColor: '#ef4444' } : {}}
-                        required 
-                      />
-                      {formErrors.price && (
-                        <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{formErrors.price}</span>
-                      )}
-                    </div>
-                    <div className="med-form-group">
-                      <label>Initial Stock Count</label>
-                      <input 
-                        type="number" 
-                        id="med-stock"
-                        value={form.stock} 
-                        onChange={(e) => {
-                          setForm({...form, stock: e.target.value})
-                          if (formErrors.stock) setFormErrors({...formErrors, stock: ''})
-                        }} 
-                        style={formErrors.stock ? { borderColor: '#ef4444' } : {}}
-                      />
-                      {formErrors.stock && (
-                        <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{formErrors.stock}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="med-detail-row">
-                    <div className="med-form-group">
-                      <label>Minimum Stock Threshold</label>
-                      <input 
-                        type="number" 
-                        id="med-minStock"
-                        value={form.minStock} 
-                        onChange={(e) => {
-                          setForm({...form, minStock: e.target.value})
-                          if (formErrors.minStock) setFormErrors({...formErrors, minStock: ''})
-                        }} 
-                        style={formErrors.minStock ? { borderColor: '#ef4444' } : {}}
-                      />
-                      {formErrors.minStock && (
-                        <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{formErrors.minStock}</span>
-                      )}
-                    </div>
-                    <div className="med-form-group">
-                      <label>Reorder Stock Level</label>
-                      <input 
-                        type="number" 
-                        id="med-reorderLevel"
-                        value={form.reorderLevel} 
-                        onChange={(e) => {
-                          setForm({...form, reorderLevel: e.target.value})
-                          if (formErrors.reorderLevel) setFormErrors({...formErrors, reorderLevel: ''})
-                        }} 
-                        style={formErrors.reorderLevel ? { borderColor: '#ef4444' } : {}}
-                      />
-                      {formErrors.reorderLevel && (
-                        <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{formErrors.reorderLevel}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="med-detail-row">
-                    <div className="med-form-group">
-                      <label>Prescription Required</label>
-                      <select 
-                        id="med-prescriptionRequired"
-                        value={form.prescriptionRequired} 
-                        onChange={(e) => setForm({...form, prescriptionRequired: e.target.value})}
-                      >
-                        <option value="No">No</option>
-                        <option value="Yes">Yes</option>
-                      </select>
-                    </div>
-                    <div className="med-form-group">
-                      <label>Catalogue Status</label>
-                      <select 
-                        id="med-status"
-                        value={form.status} 
-                        onChange={(e) => setForm({...form, status: e.target.value})}
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="med-form-group">
-                    <label>Description / Usage Notes</label>
-                    <textarea 
-                      id="med-notes"
-                      value={form.notes} 
-                      onChange={(e) => setForm({...form, notes: e.target.value})} 
-                    />
-                  </div>
+                {/* Section Quick Navigation Pills */}
+                <div className="med-modal-nav-pills">
+                  <button type="button" className="med-nav-pill" onClick={() => document.getElementById('sec-basic')?.scrollIntoView({ behavior: 'smooth' })}>
+                    <span className="pill-num">01</span> Basic Info
+                  </button>
+                  <button type="button" className="med-nav-pill" onClick={() => document.getElementById('sec-dosage')?.scrollIntoView({ behavior: 'smooth' })}>
+                    <span className="pill-num">02</span> Dosage & Pack
+                  </button>
+                  <button type="button" className="med-nav-pill" onClick={() => document.getElementById('sec-pricing')?.scrollIntoView({ behavior: 'smooth' })}>
+                    <span className="pill-num">03</span> Pricing & Stock
+                  </button>
+                  <button type="button" className="med-nav-pill" onClick={() => document.getElementById('sec-details')?.scrollIntoView({ behavior: 'smooth' })}>
+                    <span className="pill-num">04</span> Details & Notes
+                  </button>
                 </div>
-                <div className="med-modal-footer">
-                  <button type="button" className="med-btn med-btn-secondary" onClick={() => setFormOpen(false)} disabled={savine}>Cancel</button>
-                  <button type="submit" className="med-btn med-btn-primary" disabled={savine}>
-                    {savine ? 'Saving...' : editing ? 'Update Medicine' : 'Save Medicine'}
+
+                {/* Scrollable Modal Body */}
+                <div className="med-modal-body-redesign">
+                  
+                  {/* CARD 1: BASIC MEDICINE INFORMATION */}
+                  <section className="med-section-card" id="sec-basic">
+                    <div className="med-section-card-header">
+                      <div className="med-section-icon" style={{ background: '#eff6ff', color: '#2563eb' }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m10.5 11.5 5 5m-2.5-9L8 12.5a4.24 4.24 0 0 0 6 6l5-5a4.24 4.24 0 0 0-6-6Z"/></svg>
+                      </div>
+                      <div>
+                        <h3>Basic Medicine Information</h3>
+                        <p>Identify the medicine, generic classification, and code</p>
+                      </div>
+                    </div>
+                    <div className="med-card-grid">
+                      <div className="med-form-group">
+                        <label htmlFor="med-name">Medicine Name <span className="req-star">*</span></label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m10.5 11.5 5 5m-2.5-9L8 12.5a4.24 4.24 0 0 0 6 6l5-5a4.24 4.24 0 0 0-6-6Z"/></svg>
+                          <input 
+                            type="text" 
+                            id="med-name"
+                            placeholder="e.g. Amoxicillin 500mg"
+                            value={form.name} 
+                            onChange={(e) => {
+                              setForm({...form, name: e.target.value})
+                              if (formErrors.name) setFormErrors({...formErrors, name: ''})
+                            }} 
+                            className={formErrors.name ? 'is-invalid' : ''}
+                            required 
+                          />
+                        </div>
+                        {formErrors.name && <span className="form-error-msg">{formErrors.name}</span>}
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-genericName">Generic Name <span className="req-star">*</span></label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 2v7.31L4.75 18.25A2 2 0 0 0 6.46 21h11.08a2 2 0 0 0 1.71-2.75L14 9.31V2"/></svg>
+                          <input 
+                            type="text" 
+                            id="med-genericName"
+                            placeholder="e.g. Amoxicillin Trihydrate"
+                            value={form.genericName} 
+                            onChange={(e) => {
+                              setForm({...form, genericName: e.target.value})
+                              if (formErrors.genericName) setFormErrors({...formErrors, genericName: ''})
+                            }} 
+                            className={formErrors.genericName ? 'is-invalid' : ''}
+                            required
+                          />
+                        </div>
+                        {formErrors.genericName && <span className="form-error-msg">{formErrors.genericName}</span>}
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-code">Medicine Code</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8v8M11 8v8M15 8v4M17 8v8"/></svg>
+                          <input 
+                            type="text" 
+                            id="med-code"
+                            placeholder="e.g. MED-AMX-500"
+                            value={form.code} 
+                            onChange={(e) => setForm({...form, code: e.target.value})} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-brandName">Brand Name</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                          <input 
+                            type="text" 
+                            id="med-brandName"
+                            placeholder="e.g. Moxatag / Amoxil"
+                            value={form.brandName} 
+                            onChange={(e) => setForm({...form, brandName: e.target.value})} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="med-form-group med-full-width">
+                        <label htmlFor="med-category">Category <span className="req-star">*</span></label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                          <input 
+                            list="med-categories-list" 
+                            id="med-category"
+                            placeholder="Select or enter category (e.g. Antibiotics, Analgesics)"
+                            value={form.category} 
+                            onChange={(e) => {
+                              setForm({...form, category: e.target.value})
+                              if (formErrors.category) setFormErrors({...formErrors, category: ''})
+                            }} 
+                            className={formErrors.category ? 'is-invalid' : ''}
+                            required 
+                          />
+                          <datalist id="med-categories-list">
+                            {categories.map((item) => <option value={optionValue(item)} key={optionValue(item)} />)}
+                          </datalist>
+                        </div>
+                        {formErrors.category && <span className="form-error-msg">{formErrors.category}</span>}
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* CARD 2: DOSAGE & PACKAGING */}
+                  <section className="med-section-card" id="sec-dosage">
+                    <div className="med-section-card-header">
+                      <div className="med-section-icon" style={{ background: '#f0fdf4', color: '#10b981' }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                      </div>
+                      <div>
+                        <h3>Dosage & Packaging</h3>
+                        <p>Configure dosage form, strength, units, pack size and manufacturer</p>
+                      </div>
+                    </div>
+                    <div className="med-card-grid">
+                      <div className="med-form-group">
+                        <label htmlFor="med-dosageForm">Dosage Form <span className="req-star">*</span></label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="6" x2="12" y2="18"/></svg>
+                          <input 
+                            list="med-dosage-list" 
+                            id="med-dosageForm"
+                            placeholder="e.g. Capsule, Tablet, Syrup, Injection"
+                            value={form.dosageForm} 
+                            onChange={(e) => {
+                              setForm({...form, dosageForm: e.target.value})
+                              if (formErrors.dosageForm) setFormErrors({...formErrors, dosageForm: ''})
+                            }} 
+                            className={formErrors.dosageForm ? 'is-invalid' : ''}
+                            required 
+                          />
+                          <datalist id="med-dosage-list">
+                            {dosageForms.map((item) => <option value={optionValue(item)} key={optionValue(item)} />)}
+                          </datalist>
+                        </div>
+                        {formErrors.dosageForm && <span className="form-error-msg">{formErrors.dosageForm}</span>}
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-strength">Strength</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                          <input 
+                            list="med-strengths-list" 
+                            id="med-strength"
+                            placeholder="e.g. 500mg, 10mg/5ml"
+                            value={form.strength} 
+                            onChange={(e) => setForm({...form, strength: e.target.value})} 
+                          />
+                          <datalist id="med-strengths-list">
+                            {strengths.map((item) => <option value={optionValue(item)} key={optionValue(item)} />)}
+                          </datalist>
+                        </div>
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-unit">Unit</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></svg>
+                          <input 
+                            type="text" 
+                            id="med-unit"
+                            placeholder="e.g. tablet, vial, bottle, strip"
+                            value={form.unit} 
+                            onChange={(e) => setForm({...form, unit: e.target.value})} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-packSize">Pack Size</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                          <input 
+                            type="text" 
+                            id="med-packSize"
+                            placeholder="e.g. 10 tablets/strip, 100ml"
+                            value={form.packSize} 
+                            onChange={(e) => setForm({...form, packSize: e.target.value})} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="med-form-group med-full-width">
+                        <label htmlFor="med-manufacturer">Manufacturer</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+                          <input 
+                            type="text" 
+                            id="med-manufacturer"
+                            placeholder="e.g. Pfizer, Cipla, Sun Pharma"
+                            value={form.manufacturer} 
+                            onChange={(e) => setForm({...form, manufacturer: e.target.value})} 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* CARD 3: PRICING & INVENTORY */}
+                  <section className="med-section-card" id="sec-pricing">
+                    <div className="med-section-card-header">
+                      <div className="med-section-icon" style={{ background: '#fff7ed', color: '#ea580c' }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                      </div>
+                      <div>
+                        <h3>Pricing & Inventory</h3>
+                        <p>Manage purchase cost, selling price, GST tax rates, and stock thresholds</p>
+                      </div>
+                    </div>
+                    <div className="med-card-grid">
+                      <div className="med-form-group">
+                        <label htmlFor="med-purchasePrice">Purchase Price (₹)</label>
+                        <div className="input-icon-wrap">
+                          <span className="currency-prefix">₹</span>
+                          <input 
+                            type="number" 
+                            id="med-purchasePrice"
+                            placeholder="0.00"
+                            step="0.01"
+                            min="0"
+                            value={form.purchasePrice} 
+                            onChange={(e) => {
+                              setForm({...form, purchasePrice: e.target.value})
+                              if (formErrors.purchasePrice) setFormErrors({...formErrors, purchasePrice: ''})
+                            }} 
+                            className={formErrors.purchasePrice ? 'is-invalid' : ''}
+                          />
+                        </div>
+                        {formErrors.purchasePrice && <span className="form-error-msg">{formErrors.purchasePrice}</span>}
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-price">Selling Price (₹) <span className="req-star">*</span></label>
+                        <div className="input-icon-wrap">
+                          <span className="currency-prefix">₹</span>
+                          <input 
+                            type="number" 
+                            id="med-price"
+                            placeholder="0.00"
+                            step="0.01"
+                            min="0"
+                            value={form.price} 
+                            onChange={(e) => {
+                              setForm({...form, price: e.target.value})
+                              if (formErrors.price) setFormErrors({...formErrors, price: ''})
+                            }} 
+                            className={formErrors.price ? 'is-invalid' : ''}
+                            required 
+                          />
+                        </div>
+                        {formErrors.price && <span className="form-error-msg">{formErrors.price}</span>}
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-gst">GST (%)</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+                          <input 
+                            type="number" 
+                            id="med-gst"
+                            placeholder="e.g. 5, 12, 18"
+                            step="0.1"
+                            min="0"
+                            max="100"
+                            value={form.gst} 
+                            onChange={(e) => {
+                              setForm({...form, gst: e.target.value})
+                              if (formErrors.gst) setFormErrors({...formErrors, gst: ''})
+                            }} 
+                            className={formErrors.gst ? 'is-invalid' : ''}
+                          />
+                        </div>
+                        {formErrors.gst && <span className="form-error-msg">{formErrors.gst}</span>}
+                      </div>
+
+                      {/* Frontend Margin Preview Helper */}
+                      {form.price && form.purchasePrice && Number(form.price) > 0 && (
+                        <div className="med-margin-preview-badge">
+                          <span className="margin-label">Frontend Margin Preview:</span>
+                          <span className="margin-value">
+                            +₹{(Number(form.price) - Number(form.purchasePrice)).toFixed(2)} 
+                            ({(((Number(form.price) - Number(form.purchasePrice)) / Number(form.price)) * 100).toFixed(1)}% margin)
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-stock">Initial Stock Count</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                          <input 
+                            type="number" 
+                            id="med-stock"
+                            placeholder="0"
+                            min="0"
+                            value={form.stock} 
+                            onChange={(e) => {
+                              setForm({...form, stock: e.target.value})
+                              if (formErrors.stock) setFormErrors({...formErrors, stock: ''})
+                            }} 
+                            className={formErrors.stock ? 'is-invalid' : ''}
+                          />
+                        </div>
+                        <span className="input-helper-text">Current quantity when adding this medicine</span>
+                        {formErrors.stock && <span className="form-error-msg">{formErrors.stock}</span>}
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-minStock">Minimum Stock Threshold</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                          <input 
+                            type="number" 
+                            id="med-minStock"
+                            placeholder="e.g. 10"
+                            min="0"
+                            value={form.minStock} 
+                            onChange={(e) => {
+                              setForm({...form, minStock: e.target.value})
+                              if (formErrors.minStock) setFormErrors({...formErrors, minStock: ''})
+                            }} 
+                            className={formErrors.minStock ? 'is-invalid' : ''}
+                          />
+                        </div>
+                        <span className="input-helper-text">Alert when stock reaches this level</span>
+                        {formErrors.minStock && <span className="form-error-msg">{formErrors.minStock}</span>}
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-reorderLevel">Reorder Stock Level</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                          <input 
+                            type="number" 
+                            id="med-reorderLevel"
+                            placeholder="e.g. 25"
+                            min="0"
+                            value={form.reorderLevel} 
+                            onChange={(e) => {
+                              setForm({...form, reorderLevel: e.target.value})
+                              if (formErrors.reorderLevel) setFormErrors({...formErrors, reorderLevel: ''})
+                            }} 
+                            className={formErrors.reorderLevel ? 'is-invalid' : ''}
+                          />
+                        </div>
+                        <span className="input-helper-text">Recommended quantity to trigger replenishment</span>
+                        {formErrors.reorderLevel && <span className="form-error-msg">{formErrors.reorderLevel}</span>}
+                      </div>
+                    </div>
+                  </section>
+
+                  {/* CARD 4: MEDICINE DETAILS */}
+                  <section className="med-section-card" id="sec-details">
+                    <div className="med-section-card-header">
+                      <div className="med-section-icon" style={{ background: '#f3e8ff', color: '#8b5cf6' }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                      </div>
+                      <div>
+                        <h3>Medicine Details</h3>
+                        <p>Specify expiry date, prescription requirements, catalogue status, and usage instructions</p>
+                      </div>
+                    </div>
+                    <div className="med-card-grid">
+                      <div className="med-form-group">
+                        <label htmlFor="med-expiryDate">Expiry Date</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                          <input 
+                            type="date" 
+                            id="med-expiryDate"
+                            value={form.expiryDate} 
+                            onChange={(e) => setForm({...form, expiryDate: e.target.value})} 
+                          />
+                        </div>
+                      </div>
+
+                      <div className="med-form-group">
+                        <label htmlFor="med-prescriptionRequired">Prescription Required</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                          <select 
+                            id="med-prescriptionRequired"
+                            value={form.prescriptionRequired} 
+                            onChange={(e) => setForm({...form, prescriptionRequired: e.target.value})}
+                          >
+                            <option value="No">No (Over The Counter)</option>
+                            <option value="Yes">Yes (Rx Required)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="med-form-group med-full-width">
+                        <label htmlFor="med-status">Catalogue Status</label>
+                        <div className="input-icon-wrap">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                          <select 
+                            id="med-status"
+                            value={form.status} 
+                            onChange={(e) => setForm({...form, status: e.target.value})}
+                          >
+                            <option value="Active">Active (Available for Dispensing)</option>
+                            <option value="Inactive">Inactive (Disabled in Catalogue)</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="med-form-group med-full-width">
+                        <label htmlFor="med-notes">Description / Usage Notes</label>
+                        <textarea 
+                          id="med-notes"
+                          placeholder="Add dosage instructions, storage guidelines, contraindications, or internal pharmacy notes..."
+                          value={form.notes} 
+                          onChange={(e) => setForm({...form, notes: e.target.value})} 
+                          rows="3"
+                        />
+                        <span className="input-helper-text">Add dosage instructions, storage notes, or other relevant details.</span>
+                      </div>
+                    </div>
+                  </section>
+
+                </div>
+
+                {/* Sticky Footer */}
+                <div className="med-modal-footer-redesign">
+                  <button 
+                    type="button" 
+                    className="med-btn-cancel" 
+                    onClick={() => setFormOpen(false)}
+                    disabled={savine}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="med-btn-save" 
+                    disabled={savine}
+                  >
+                    {savine ? (
+                      <>
+                        <svg className="spinner-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.3"/><path fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                        Saving...
+                      </>
+                    ) : editing ? (
+                      'Update Medicine Profile'
+                    ) : (
+                      'Save Medicine'
+                    )}
                   </button>
                 </div>
               </form>
@@ -1121,6 +1465,13 @@ export default function Medicines() {
                 </div>
               </div>
             </div>
+          )}
+
+          {showSuccessAnim && (
+            <MedicineSuccessAnimation
+              active={showSuccessAnim}
+              onComplete={() => setShowSuccessAnim(false)}
+            />
           )}
 
         </div>

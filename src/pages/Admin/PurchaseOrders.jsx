@@ -492,31 +492,84 @@ export default function PurchaseOrders() {
             </button>
           </div>
 
-          {/* Summary Cards */}
+          {/* Summary Cards (6 Equal Sized Cards) */}
           <div className="po-summary-grid">
-            <div className="po-summary-card">
-              <label>Total POs</label>
-              <span>{summary.total}</span>
+            <div className="po-summary-card" style={{ '--card-accent': '#2563eb', '--card-bg': '#eff6ff', '--card-border': 'rgba(37, 99, 235, 0.2)' }}>
+              <div className="po-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                  <line x1="3" y1="6" x2="21" y2="6"/>
+                  <path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+              </div>
+              <div className="po-summary-info">
+                <label>Total POs</label>
+                <span>{summary.total}</span>
+              </div>
             </div>
-            <div className="po-summary-card" style={{ borderLeft: '3px solid #f59e0b' }}>
-              <label style={{ color: '#f59e0b' }}>Pending</label>
-              <span style={{ color: '#f59e0b' }}>{summary.pending}</span>
+
+            <div className="po-summary-card" style={{ '--card-accent': '#f59e0b', '--card-bg': '#fef3c7', '--card-border': 'rgba(245, 158, 11, 0.2)' }}>
+              <div className="po-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div className="po-summary-info">
+                <label>Pending</label>
+                <span>{summary.pending}</span>
+              </div>
             </div>
-            <div className="po-summary-card" style={{ borderLeft: '3px solid #2563eb' }}>
-              <label style={{ color: '#2563eb' }}>Ordered</label>
-              <span style={{ color: '#2563eb' }}>{summary.ordered}</span>
+
+            <div className="po-summary-card" style={{ '--card-accent': '#0ea5e9', '--card-bg': '#e0f2fe', '--card-border': 'rgba(14, 165, 233, 0.2)' }}>
+              <div className="po-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m14.5 4.5 5 5a4.24 4.24 0 0 1-6 6l-5-5a4.24 4.24 0 0 1 6-6Z"/>
+                </svg>
+              </div>
+              <div className="po-summary-info">
+                <label>Ordered</label>
+                <span>{summary.ordered}</span>
+              </div>
             </div>
-            <div className="po-summary-card" style={{ borderLeft: '3px solid #eab308' }}>
-              <label style={{ color: '#eab308' }}>Partial Recv</label>
-              <span style={{ color: '#eab308' }}>{summary.partial}</span>
+
+            <div className="po-summary-card" style={{ '--card-accent': '#eab308', '--card-bg': '#fefce8', '--card-border': 'rgba(234, 179, 8, 0.2)' }}>
+              <div className="po-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+              </div>
+              <div className="po-summary-info">
+                <label>Partial Recv</label>
+                <span>{summary.partial}</span>
+              </div>
             </div>
-            <div className="po-summary-card" style={{ borderLeft: '3px solid #10b981' }}>
-              <label style={{ color: '#10b981' }}>Fully Recv</label>
-              <span style={{ color: '#10b981' }}>{summary.received}</span>
+
+            <div className="po-summary-card" style={{ '--card-accent': '#10b981', '--card-bg': '#ecfdf5', '--card-border': 'rgba(16, 185, 129, 0.2)' }}>
+              <div className="po-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div className="po-summary-info">
+                <label>Fully Recv</label>
+                <span>{summary.received}</span>
+              </div>
             </div>
-            <div className="po-summary-card" style={{ borderLeft: '3px solid #10b981' }}>
-              <label style={{ color: '#10b981' }}>Purchase Amount</label>
-              <span style={{ color: '#10b981' }}>{summary.totalAmount}</span>
+
+            <div className="po-summary-card" style={{ '--card-accent': '#059669', '--card-bg': '#d1fae5', '--card-border': 'rgba(5, 150, 105, 0.2)' }}>
+              <div className="po-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"/>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </div>
+              <div className="po-summary-info">
+                <label style={{ color: '#059669' }}>Purchase Amount</label>
+                <span style={{ color: '#059669' }}>{summary.totalAmount}</span>
+              </div>
             </div>
           </div>
 

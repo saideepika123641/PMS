@@ -67,6 +67,14 @@ function App() {
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/medicines" element={<AdminMedicines />} />
           <Route path="/admin/stock" element={<AdminStock />} />
+          <Route path="/inventory" element={<AdminStock initialView="inventory" />} />
+          <Route path="/low-stock" element={<AdminStock initialView="low" />} />
+          <Route path="/near-expiry" element={<AdminStock initialView="near" />} />
+          <Route path="/out-of-stock" element={<AdminStock initialView="out" />} />
+          <Route path="/stock-summary" element={<AdminStock initialView="summary" />} />
+          <Route path="/transactions" element={<AdminStock initialView="transactions" />} />
+          <Route path="/valuation" element={<AdminStock initialView="valuation" />} />
+          <Route path="/expired" element={<AdminStock initialView="expired" />} />
           <Route path="/admin/suppliers" element={<AdminSuppliers />} />
           <Route path="/admin/purchase-orders" element={<AdminPurchaseOrders />} />
           <Route path="/admin/stock-transfers" element={<AdminStockTransfers />} />

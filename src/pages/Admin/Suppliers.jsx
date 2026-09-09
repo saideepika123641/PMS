@@ -420,7 +420,7 @@ export default function Suppliers() {
                 onClick={() => setCreateOpen(true)}
               >
                 <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                + Add Supplier
+                Add Supplier
               </button>
             </div>
             <button 
@@ -433,23 +433,60 @@ export default function Suppliers() {
             </button>
           </div>
 
-          {/* Summary Cards */}
+          {/* Summary Cards (4 Equal Sized Cards) */}
           <div className="sup-summary-grid">
-            <div className="sup-summary-card">
-              <label>Total Suppliers</label>
-              <span>{summary.total}</span>
+            <div className="sup-summary-card" style={{ '--card-accent': '#2563eb', '--card-bg': '#eff6ff', '--card-border': 'rgba(37, 99, 235, 0.2)' }}>
+              <div className="sup-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <div className="sup-summary-info">
+                <label>Total Suppliers</label>
+                <span>{summary.total}</span>
+              </div>
             </div>
-            <div className="sup-summary-card" style={{ borderLeft: '3px solid #10b981' }}>
-              <label style={{ color: '#10b981' }}>Active Suppliers</label>
-              <span style={{ color: '#10b981' }}>{summary.active}</span>
+
+            <div className="sup-summary-card" style={{ '--card-accent': '#10b981', '--card-bg': '#ecfdf5', '--card-border': 'rgba(16, 185, 129, 0.2)' }}>
+              <div className="sup-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div className="sup-summary-info">
+                <label style={{ color: '#10b981' }}>Active Suppliers</label>
+                <span style={{ color: '#10b981' }}>{summary.active}</span>
+              </div>
             </div>
-            <div className="sup-summary-card" style={{ borderLeft: '3px solid #f59e0b' }}>
-              <label style={{ color: '#f59e0b' }}>Pending Suppliers</label>
-              <span style={{ color: '#f59e0b' }}>{summary.pending}</span>
+
+            <div className="sup-summary-card" style={{ '--card-accent': '#f59e0b', '--card-bg': '#fef3c7', '--card-border': 'rgba(245, 158, 11, 0.2)' }}>
+              <div className="sup-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div className="sup-summary-info">
+                <label style={{ color: '#f59e0b' }}>Pending Suppliers</label>
+                <span style={{ color: '#f59e0b' }}>{summary.pending}</span>
+              </div>
             </div>
-            <div className="sup-summary-card" style={{ borderLeft: '3px solid #3b82f6' }}>
-              <label style={{ color: '#3b82f6' }}>Total Purchases</label>
-              <span style={{ color: '#3b82f6' }}>{summary.purchases}</span>
+
+            <div className="sup-summary-card" style={{ '--card-accent': '#0ea5e9', '--card-bg': '#e0f2fe', '--card-border': 'rgba(14, 165, 233, 0.2)' }}>
+              <div className="sup-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"/>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </div>
+              <div className="sup-summary-info">
+                <label style={{ color: '#0ea5e9' }}>Total Purchases</label>
+                <span style={{ color: '#0ea5e9' }}>{summary.purchases}</span>
+              </div>
             </div>
           </div>
 

@@ -224,71 +224,168 @@ export default function Dispensing() {
       <div className="stock-scroll-area">
         <div className="dispense-layout-container">
 
-          {/* Workflow Tabs */}
-          <div className="dispense-workflow-tabs">
+          {/* Workflow Tabs (Spaced Card Buttons) */}
+          <div className="dispense-workflow-cards-grid">
             <button 
               type="button" 
-              className={`dispense-tab-btn ${activeWorkflow === 'prescriptions' ? 'is-active' : 'is-normal'}`}
+              className={`dispense-workflow-card ${activeWorkflow === 'prescriptions' ? 'active' : ''}`}
+              style={{ '--card-accent': '#2563eb', '--card-bg': '#eff6ff', '--card-border': 'rgba(37, 99, 235, 0.25)' }}
               onClick={() => loadActiveTab('prescriptions')}
             >
-              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-              Prescriptions
+              <div className="dispense-card-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                </svg>
+              </div>
+              <div className="dispense-card-text">
+                <span>Prescriptions</span>
+                <small>Rx Queue</small>
+              </div>
             </button>
+
             <button 
               type="button" 
-              className={`dispense-tab-btn ${activeWorkflow === 'dispense' ? 'is-active' : 'is-normal'}`}
+              className={`dispense-workflow-card ${activeWorkflow === 'dispense' ? 'active' : ''}`}
+              style={{ '--card-accent': '#0ea5e9', '--card-bg': '#e0f2fe', '--card-border': 'rgba(14, 165, 233, 0.25)' }}
               onClick={() => loadActiveTab('dispense')}
             >
-              <svg viewBox="0 0 24 24"><path d="m14.5 4.5 5 5a4.24 4.24 0 0 1-6 6l-5-5a4.24 4.24 0 0 1 6-6Z"/><path d="m10 9 5 5"/></svg>
-              Dispense Medicine
+              <div className="dispense-card-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m14.5 4.5 5 5a4.24 4.24 0 0 1-6 6l-5-5a4.24 4.24 0 0 1 6-6Z"/>
+                  <path d="m10 9 5 5"/>
+                </svg>
+              </div>
+              <div className="dispense-card-text">
+                <span>Dispense Medicine</span>
+                <small>Fulfill Rx</small>
+              </div>
             </button>
+
             <button 
               type="button" 
-              className={`dispense-tab-btn ${activeWorkflow === 'bill' ? 'is-active' : 'is-normal'}`}
+              className={`dispense-workflow-card ${activeWorkflow === 'bill' ? 'active' : ''}`}
+              style={{ '--card-accent': '#f59e0b', '--card-bg': '#fef3c7', '--card-border': 'rgba(245, 158, 11, 0.25)' }}
               onClick={() => loadActiveTab('bill')}
             >
-              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-              Generate Bill
+              <div className="dispense-card-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
+              <div className="dispense-card-text">
+                <span>Generate Bill</span>
+                <small>Create Invoice</small>
+              </div>
             </button>
+
             <button 
               type="button" 
-              className={`dispense-tab-btn ${activeWorkflow === 'invoices' ? 'is-active' : 'is-normal'}`}
+              className={`dispense-workflow-card ${activeWorkflow === 'invoices' ? 'active' : ''}`}
+              style={{ '--card-accent': '#8b5cf6', '--card-bg': '#f3e8ff', '--card-border': 'rgba(139, 92, 246, 0.25)' }}
               onClick={() => loadActiveTab('invoices')}
             >
-              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Invoices
+              <div className="dispense-card-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+              </div>
+              <div className="dispense-card-text">
+                <span>Invoices</span>
+                <small>Billing Records</small>
+              </div>
             </button>
+
             <button 
               type="button" 
-              className={`dispense-tab-btn is-payment ${activeWorkflow === 'payments' ? 'is-active' : ''}`}
+              className={`dispense-workflow-card ${activeWorkflow === 'payments' ? 'active' : ''}`}
+              style={{ '--card-accent': '#10b981', '--card-bg': '#ecfdf5', '--card-border': 'rgba(16, 185, 129, 0.25)' }}
               onClick={() => loadActiveTab('payments')}
             >
-              <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><circle cx="12" cy="15" r="2"/></svg>
-              Payments
+              <div className="dispense-card-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                  <circle cx="12" cy="15" r="2"/>
+                </svg>
+              </div>
+              <div className="dispense-card-text">
+                <span>Payments</span>
+                <small>Record Payment</small>
+              </div>
             </button>
           </div>
 
-          {/* Billing Summary Cards */}
+          {/* Billing Summary Cards (5 Equal Sized Cards) */}
           <div className="dispense-summary-grid">
-            <div className="dispense-summary-card">
-              <label>Pending Prescriptions</label>
-              <span>{summary.pendingPrescriptions}</span>
+            <div className="dispense-summary-card" style={{ '--card-accent': '#2563eb', '--card-bg': '#eff6ff', '--card-border': 'rgba(37, 99, 235, 0.2)' }}>
+              <div className="dispense-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                </svg>
+              </div>
+              <div className="dispense-summary-info">
+                <label>Pending Prescriptions</label>
+                <span>{summary.pendingPrescriptions}</span>
+              </div>
             </div>
-            <div className="dispense-summary-card">
-              <label>Today's Dispensing</label>
-              <span>{summary.todayDispensing}</span>
+
+            <div className="dispense-summary-card" style={{ '--card-accent': '#0ea5e9', '--card-bg': '#e0f2fe', '--card-border': 'rgba(14, 165, 233, 0.2)' }}>
+              <div className="dispense-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m14.5 4.5 5 5a4.24 4.24 0 0 1-6 6l-5-5a4.24 4.24 0 0 1 6-6Z"/>
+                </svg>
+              </div>
+              <div className="dispense-summary-info">
+                <label>Today's Dispensing</label>
+                <span>{summary.todayDispensing}</span>
+              </div>
             </div>
-            <div className="dispense-summary-card">
-              <label>Pending Bills</label>
-              <span>{summary.pendingBills}</span>
+
+            <div className="dispense-summary-card" style={{ '--card-accent': '#f59e0b', '--card-bg': '#fef3c7', '--card-border': 'rgba(245, 158, 11, 0.2)' }}>
+              <div className="dispense-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
+              <div className="dispense-summary-info">
+                <label>Pending Bills</label>
+                <span>{summary.pendingBills}</span>
+              </div>
             </div>
-            <div className="dispense-summary-card">
-              <label>Paid Bills</label>
-              <span>{summary.paidBills}</span>
+
+            <div className="dispense-summary-card" style={{ '--card-accent': '#8b5cf6', '--card-bg': '#f3e8ff', '--card-border': 'rgba(139, 92, 246, 0.2)' }}>
+              <div className="dispense-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div className="dispense-summary-info">
+                <label>Paid Bills</label>
+                <span>{summary.paidBills}</span>
+              </div>
             </div>
-            <div className="dispense-summary-card" style={{ borderLeft: '3px solid #10b981' }}>
-              <label style={{ color: '#10b981' }}>Today's Revenue</label>
-              <span style={{ color: '#10b981' }}>{summary.todayRevenue}</span>
+
+            <div className="dispense-summary-card" style={{ '--card-accent': '#10b981', '--card-bg': '#ecfdf5', '--card-border': 'rgba(16, 185, 129, 0.2)' }}>
+              <div className="dispense-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23"/>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+              </div>
+              <div className="dispense-summary-info">
+                <label style={{ color: '#10b981' }}>Today's Revenue</label>
+                <span style={{ color: '#10b981' }}>{summary.todayRevenue}</span>
+              </div>
             </div>
           </div>
 

@@ -297,27 +297,71 @@ export default function Prescriptions() {
             </button>
           </div>
 
-          {/* Summary Cards */}
+          {/* Summary Cards (5 Equal Sized Cards) */}
           <div className="presc-summary-grid">
-            <div className="presc-summary-card">
-              <label>Total Prescriptions</label>
-              <span>{summary.total}</span>
+            <div className="presc-summary-card" style={{ '--card-accent': '#2563eb', '--card-bg': '#eff6ff', '--card-border': 'rgba(37, 99, 235, 0.2)' }}>
+              <div className="presc-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+              </div>
+              <div className="presc-summary-info">
+                <label>Total Prescriptions</label>
+                <span>{summary.total}</span>
+              </div>
             </div>
-            <div className="presc-summary-card" style={{ borderLeft: '3px solid #f59e0b' }}>
-              <label style={{ color: '#f59e0b' }}>Pending</label>
-              <span style={{ color: '#f59e0b' }}>{summary.pending}</span>
+
+            <div className="presc-summary-card" style={{ '--card-accent': '#f59e0b', '--card-bg': '#fef3c7', '--card-border': 'rgba(245, 158, 11, 0.2)' }}>
+              <div className="presc-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <div className="presc-summary-info">
+                <label>Pending</label>
+                <span>{summary.pending}</span>
+              </div>
             </div>
-            <div className="presc-summary-card" style={{ borderLeft: '3px solid #2563eb' }}>
-              <label style={{ color: '#2563eb' }}>In Progress</label>
-              <span style={{ color: '#2563eb' }}>{summary.inProgress}</span>
+
+            <div className="presc-summary-card" style={{ '--card-accent': '#0ea5e9', '--card-bg': '#e0f2fe', '--card-border': 'rgba(14, 165, 233, 0.2)' }}>
+              <div className="presc-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m14.5 4.5 5 5a4.24 4.24 0 0 1-6 6l-5-5a4.24 4.24 0 0 1 6-6Z"/>
+                </svg>
+              </div>
+              <div className="presc-summary-info">
+                <label>In Progress</label>
+                <span>{summary.inProgress}</span>
+              </div>
             </div>
-            <div className="presc-summary-card" style={{ borderLeft: '3px solid #10b981' }}>
-              <label style={{ color: '#10b981' }}>Completed</label>
-              <span style={{ color: '#10b981' }}>{summary.completed}</span>
+
+            <div className="presc-summary-card" style={{ '--card-accent': '#10b981', '--card-bg': '#ecfdf5', '--card-border': 'rgba(16, 185, 129, 0.2)' }}>
+              <div className="presc-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                  <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <div className="presc-summary-info">
+                <label>Completed</label>
+                <span>{summary.completed}</span>
+              </div>
             </div>
-            <div className="presc-summary-card" style={{ borderLeft: '3px solid #ef4444' }}>
-              <label style={{ color: '#ef4444' }}>Cancelled</label>
-              <span style={{ color: '#ef4444' }}>{summary.cancelled}</span>
+
+            <div className="presc-summary-card" style={{ '--card-accent': '#ef4444', '--card-bg': '#fee2e2', '--card-border': 'rgba(239, 68, 68, 0.2)' }}>
+              <div className="presc-summary-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="15" y1="9" x2="9" y2="15"/>
+                  <line x1="9" y1="9" x2="15" y2="15"/>
+                </svg>
+              </div>
+              <div className="presc-summary-info">
+                <label>Cancelled</label>
+                <span>{summary.cancelled}</span>
+              </div>
             </div>
           </div>
 
