@@ -8,7 +8,9 @@
 
 /* Global Design System Tokens & Reusable Component Classes */
 :root {
-  --app-bg: #f6f9fc;
+  --app-bg: #eaf4fc;
+  --sidebar-bg: #e8f3fc;
+  --sidebar-border: #d4e5f5;
   --card-radius: 18px;
   --card-border-default: #e2e8f0;
   --card-shadow-soft: 0 2px 4px rgba(0, 0, 0, 0.02);
@@ -259,4 +261,185 @@
 .expiry-tab-card.active .expiry-card-text small {
   color: #ffffff !important;
 }
+
+/* Super Admin Reusable Modals */
+.sa-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: saFadeIn 0.15s ease-out;
+}
+
+@keyframes saFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sa-modal-card {
+  width: min(540px, 95vw);
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: saScaleUp 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes saScaleUp {
+  from { transform: scale(0.95) translateY(6px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.sa-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.sa-modal-header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.sa-modal-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 18px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.sa-modal-close:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.sa-modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.sa-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sa-modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sa-modal-field label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sa-modal-field input,
+.sa-modal-field select,
+.sa-modal-field textarea {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #0f172a;
+  background: #ffffff;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.sa-modal-field textarea {
+  height: auto;
+  min-height: 70px;
+  padding: 8px 12px;
+}
+
+.sa-modal-field input:focus,
+.sa-modal-field select:focus,
+.sa-modal-field textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.sa-modal-field span {
+  font-size: 13.5px;
+  color: #0f172a;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.sa-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid #edf2f7;
+  background: #f8fafc;
+}
+
+.sa-btn-primary {
+  height: 36px;
+  padding: 0 16px;
+  background: #2563eb;
+  color: #ffffff;
+  border: 1px solid #2563eb;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sa-btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.sa-btn-secondary {
+  height: 36px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.sa-btn-secondary:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
 

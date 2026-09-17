@@ -1,18 +1,25 @@
 .profile-page {
   min-height: 100vh;
-  background: #f4f7fb;
+  background:
+    radial-gradient(ellipse 70% 55% at 90% 12%, rgba(186, 230, 253, 0.7) 0%, rgba(199, 240, 255, 0.4) 40%, transparent 75%),
+    radial-gradient(ellipse 60% 45% at 95% 45%, rgba(167, 243, 208, 0.3) 0%, rgba(207, 250, 254, 0.25) 35%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 20% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 65%),
+    linear-gradient(145deg, #f2f8fe 0%, #ebf5fc 45%, #e1effa 100%);
+  background-attachment: fixed;
   color: #102b49;
 }
 
 .profile-super-admin-shell {
   display: block;
   padding-left: 248px;
+  background: transparent;
 }
 
 .profile-pharmacist-shell,
 .profile-admin-shell {
   display: block;
   padding-left: 248px;
+  background: transparent;
 }
 
 .profile-super-admin-shell .profile-main,
@@ -20,6 +27,7 @@
 .profile-admin-shell .profile-main {
   min-height: 100vh;
   overflow: visible;
+  background: transparent !important;
 }
 
 .profile-sidebar {
@@ -30,8 +38,8 @@
   display: flex;
   flex-direction: column;
   padding: 18px 14px;
-  border-right: 1px solid #e2e8f0;
-  background: #ffffff;
+  border-right: 1px solid #d4e5f5;
+  background: #e8f3fc !important;
   z-index: 10;
   box-sizing: border-box;
 }
@@ -41,7 +49,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px 8px 18px;
-  border-bottom: 1px solid #edf2f7;
+  border-bottom: 1px solid #dbeaf6;
 }
 
 .profile-brand b {
@@ -92,13 +100,14 @@
 }
 
 .profile-side-nav button:hover {
-  background: #f1f5f9;
+  background: rgba(255, 255, 255, 0.55);
   color: #0f172a;
 }
 
 .profile-side-nav button.active {
-  background: #eff6ff;
+  background: #ffffff;
   color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
 }
 
 .profile-side-nav button.danger-text {

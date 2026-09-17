@@ -104,6 +104,75 @@ async function toggleClinicStatus(clinic) {
     }
   }
 
+  const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [viewingClinic, setViewingClinic] = useState(null)
+  const [editingClinic, setEditingClinic] = useState(null)
+  const [clinicForm, setClinicForm] = useState({ name: '', address: '', phone: '', email: '', status: 'Active' })
+
+  function openCreate() {
+    setClinicForm({ name: '', address: '', phone: '', email: '', status: 'Active' })
+    setCreateModalOpen(true)
+  }
+
+  function openView(clinic) {
+    setViewingClinic(clinic)
+  }
+
+  function openEdit(clinic) {
+    setEditingClinic(clinic)
+    setClinicForm({
+      name: clinicName(clinic),
+      address: clinicAddress(clinic) === '-' ? '' : clinicAddress(clinic),
+      phone: clinicPhone(clinic) === '-' ? '' : clinicPhone(clinic),
+      email: clinic?.email || '',
+      status: clinicStatus(clinic)
+    })
+  }
+
+  function handleCreate(e) {
+    e.preventDefault()
+    const newClinic = {
+      _id: `clinic-${Date.now()}`,
+      name: clinicForm.name,
+      clinicName: clinicForm.name,
+      address: clinicForm.address,
+      phone: clinicForm.phone,
+      email: clinicForm.email,
+      status: clinicForm.status,
+      isActive: clinicForm.status === 'Active'
+    }
+    setClinics((current) => [newClinic, ...current])
+    setCreateModalOpen(false)
+  }
+
+  function handleSaveEdit(e) {
+    e.preventDefault()
+    const id = clinicId(editingClinic)
+    setClinics((current) => current.map((item) => {
+      if (clinicId(item) === id) {
+        return {
+          ...item,
+          name: clinicForm.name,
+          clinicName: clinicForm.name,
+          address: clinicForm.address,
+          phone: clinicForm.phone,
+          email: clinicForm.email,
+          status: clinicForm.status,
+          isActive: clinicForm.status === 'Active'
+        }
+      }
+      return item
+    }))
+    setEditingClinic(null)
+  }
+
+  function handleDelete(clinic) {
+    const name = clinicName(clinic)
+    if (!window.confirm(`Are you sure you want to delete ${name}?`)) return
+    const id = clinicId(clinic)
+    setClinics((current) => current.filter((item) => clinicId(item) !== id))
+  }
+
   const pageCount = Math.max(1, Math.ceil(filteredClinics.length / pageSize))
   const visibleClinics = filteredClinics.slice((page - 1) * pageSize, page * pageSize)
 
@@ -112,7 +181,15 @@ async function toggleClinicStatus(clinic) {
       <SuperAdminSidebar activeLabel="Clinics" />
       <main className="super-admin-main">
         <SuperAdminTopbar onMenu={() => {}} />
-        <section className="clinics-heading"><h1>Clinic Management</h1><p>{filteredClinics.length} clinics found</p></section>
+        <section className="clinics-heading" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <h1>Clinic Management</h1>
+            <p>{filteredClinics.length} clinics found</p>
+          </div>
+          <button type="button" className="sa-btn-primary" onClick={openCreate} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <span>＋</span> Add Clinic
+          </button>
+        </section>
         <section className="clinics-panel">
           <div className="clinics-toolbar">
             <label className="clinics-search"><Icon name="search" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search clinics by name, address, or email..." /></label>
@@ -122,13 +199,136 @@ async function toggleClinicStatus(clinic) {
             <table className="clinics-table">
               <thead><tr><th>S.No</th><th>Clinic Name</th><th>Address</th><th>Contact Number</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody>
-                {loading ? <tr><td colSpan="7">Loading clinics...</td></tr> : error ? <tr><td colSpan="7" className="clinics-error">{error}</td></tr> : visibleClinics.length ? visibleClinics.map((clinic, index) => { const status = clinicStatus(clinic); return <tr key={clinic?._id || clinic?.id || `${clinicName(clinic)}-${index}`}><td>{(page - 1) * pageSize + index + 1}</td><td><span className="clinic-name"><span className="clinic-avatar">{clinicName(clinic).slice(0, 1).toUpperCase()}</span>{clinicName(clinic)}</span></td><td><span className="clinic-with-icon"><Icon name="map" />{clinicAddress(clinic)}</span></td><td><span className="clinic-with-icon"><Icon name="phone" />{clinicPhone(clinic)}</span></td><td>{clinic?.email || '-'}</td><td><span className={`clinic-status ${status.toLowerCase()}`}>{status}</span></td><td><span className="clinic-actions"><button className="clinic-action-button view" type="button" aria-label={`View ${clinicName(clinic)}`} title={`View ${clinicName(clinic)}`}><Icon name="eye" /></button><button className="clinic-action-button edit" type="button" aria-label={`Edit ${clinicName(clinic)}`} title={`Edit ${clinicName(clinic)}`}><Icon name="edit" /></button><button className="clinic-action-button select" type="button" aria-label={`${status.toLowerCase() === 'active' ? 'Deactivate' : 'Activate'} ${clinicName(clinic)}`} title={`${status.toLowerCase() === 'active' ? 'Deactivate' : 'Activate'} ${clinicName(clinic)}`} onClick={() => toggleClinicStatus(clinic)}><Icon name="select" /></button><button className="clinic-action-button danger" type="button" aria-label={`Delete ${clinicName(clinic)}`} title={`Delete ${clinicName(clinic)}`}><Icon name="trash" /></button></span></td></tr> }) : <tr><td colSpan="7">No clinics found.</td></tr>}
+                {loading ? <tr><td colSpan="7">Loading clinics...</td></tr> : error ? <tr><td colSpan="7" className="clinics-error">{error}</td></tr> : visibleClinics.length ? visibleClinics.map((clinic, index) => { const status = clinicStatus(clinic); return <tr key={clinic?._id || clinic?.id || `${clinicName(clinic)}-${index}`}><td>{(page - 1) * pageSize + index + 1}</td><td><span className="clinic-name"><span className="clinic-avatar">{clinicName(clinic).slice(0, 1).toUpperCase()}</span>{clinicName(clinic)}</span></td><td><span className="clinic-with-icon"><Icon name="map" />{clinicAddress(clinic)}</span></td><td><span className="clinic-with-icon"><Icon name="phone" />{clinicPhone(clinic)}</span></td><td>{clinic?.email || '-'}</td><td><span className={`clinic-status ${status.toLowerCase()}`}>{status}</span></td><td><span className="clinic-actions"><button className="clinic-action-button view" type="button" aria-label={`View ${clinicName(clinic)}`} title={`View ${clinicName(clinic)}`} onClick={() => openView(clinic)}><Icon name="eye" /></button><button className="clinic-action-button edit" type="button" aria-label={`Edit ${clinicName(clinic)}`} title={`Edit ${clinicName(clinic)}`} onClick={() => openEdit(clinic)}><Icon name="edit" /></button><button className="clinic-action-button select" type="button" aria-label={`${status.toLowerCase() === 'active' ? 'Deactivate' : 'Activate'} ${clinicName(clinic)}`} title={`${status.toLowerCase() === 'active' ? 'Deactivate' : 'Activate'} ${clinicName(clinic)}`} onClick={() => toggleClinicStatus(clinic)}><Icon name="select" /></button><button className="clinic-action-button danger" type="button" aria-label={`Delete ${clinicName(clinic)}`} title={`Delete ${clinicName(clinic)}`} onClick={() => handleDelete(clinic)}><Icon name="trash" /></button></span></td></tr> }) : <tr><td colSpan="7">No clinics found.</td></tr>}
               </tbody>
             </table>
           </div>
           <footer className="clinics-footer"><span>Showing {visibleClinics.length} of {filteredClinics.length} clinics</span><div><button type="button" onClick={() => setPage(1)} disabled={page === 1}>First</button><button type="button" onClick={() => setPage((value) => Math.max(1, value - 1))} disabled={page === 1}>Prev</button><strong>Page {page} of {pageCount}</strong><button type="button" onClick={() => setPage((value) => Math.min(pageCount, value + 1))} disabled={page === pageCount}>Next</button><button type="button" onClick={() => setPage(pageCount)} disabled={page === pageCount}>Last</button></div></footer>
         </section>
       </main>
+
+      {createModalOpen && (
+        <div className="sa-modal-backdrop" onClick={() => setCreateModalOpen(false)}>
+          <form className="sa-modal-card" onSubmit={handleCreate} onClick={(e) => e.stopPropagation()}>
+            <div className="sa-modal-header">
+              <h2>Add New Clinic</h2>
+              <button type="button" className="sa-modal-close" onClick={() => setCreateModalOpen(false)}>&times;</button>
+            </div>
+            <div className="sa-modal-body">
+              <div className="sa-modal-grid">
+                <div className="sa-modal-field">
+                  <label>Clinic Name *</label>
+                  <input required value={clinicForm.name} onChange={(e) => setClinicForm({ ...clinicForm, name: e.target.value })} placeholder="e.g. City Health Clinic" />
+                </div>
+                <div className="sa-modal-field">
+                  <label>Contact Number *</label>
+                  <input required value={clinicForm.phone} onChange={(e) => setClinicForm({ ...clinicForm, phone: e.target.value })} placeholder="e.g. 9876543210" />
+                </div>
+                <div className="sa-modal-field">
+                  <label>Email Address</label>
+                  <input type="email" value={clinicForm.email} onChange={(e) => setClinicForm({ ...clinicForm, email: e.target.value })} placeholder="clinic@example.com" />
+                </div>
+                <div className="sa-modal-field">
+                  <label>Status</label>
+                  <select value={clinicForm.status} onChange={(e) => setClinicForm({ ...clinicForm, status: e.target.value })}>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+                <div className="sa-modal-field" style={{ gridColumn: '1 / -1' }}>
+                  <label>Address *</label>
+                  <textarea required value={clinicForm.address} onChange={(e) => setClinicForm({ ...clinicForm, address: e.target.value })} placeholder="Full address" />
+                </div>
+              </div>
+            </div>
+            <div className="sa-modal-footer">
+              <button type="button" className="sa-btn-secondary" onClick={() => setCreateModalOpen(false)}>Cancel</button>
+              <button type="submit" className="sa-btn-primary">Create Clinic</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {viewingClinic && (
+        <div className="sa-modal-backdrop" onClick={() => setViewingClinic(null)}>
+          <div className="sa-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="sa-modal-header">
+              <h2>Clinic Details: {clinicName(viewingClinic)}</h2>
+              <button type="button" className="sa-modal-close" onClick={() => setViewingClinic(null)}>&times;</button>
+            </div>
+            <div className="sa-modal-body">
+              <div className="sa-modal-grid">
+                <div className="sa-modal-field">
+                  <label>Clinic Name</label>
+                  <span>{clinicName(viewingClinic)}</span>
+                </div>
+                <div className="sa-modal-field">
+                  <label>Contact Number</label>
+                  <span>{clinicPhone(viewingClinic)}</span>
+                </div>
+                <div className="sa-modal-field">
+                  <label>Email Address</label>
+                  <span>{viewingClinic?.email || '-'}</span>
+                </div>
+                <div className="sa-modal-field">
+                  <label>Status</label>
+                  <span>{clinicStatus(viewingClinic)}</span>
+                </div>
+                <div className="sa-modal-field" style={{ gridColumn: '1 / -1' }}>
+                  <label>Address</label>
+                  <span>{clinicAddress(viewingClinic)}</span>
+                </div>
+              </div>
+            </div>
+            <div className="sa-modal-footer">
+              <button type="button" className="sa-btn-secondary" onClick={() => setViewingClinic(null)}>Close</button>
+              <button type="button" className="sa-btn-primary" onClick={() => { const cl = viewingClinic; setViewingClinic(null); openEdit(cl) }}>Edit Clinic</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editingClinic && (
+        <div className="sa-modal-backdrop" onClick={() => setEditingClinic(null)}>
+          <form className="sa-modal-card" onSubmit={handleSaveEdit} onClick={(e) => e.stopPropagation()}>
+            <div className="sa-modal-header">
+              <h2>Edit Clinic</h2>
+              <button type="button" className="sa-modal-close" onClick={() => setEditingClinic(null)}>&times;</button>
+            </div>
+            <div className="sa-modal-body">
+              <div className="sa-modal-grid">
+                <div className="sa-modal-field">
+                  <label>Clinic Name *</label>
+                  <input required value={clinicForm.name} onChange={(e) => setClinicForm({ ...clinicForm, name: e.target.value })} />
+                </div>
+                <div className="sa-modal-field">
+                  <label>Contact Number</label>
+                  <input value={clinicForm.phone} onChange={(e) => setClinicForm({ ...clinicForm, phone: e.target.value })} />
+                </div>
+                <div className="sa-modal-field">
+                  <label>Email Address</label>
+                  <input type="email" value={clinicForm.email} onChange={(e) => setClinicForm({ ...clinicForm, email: e.target.value })} />
+                </div>
+                <div className="sa-modal-field">
+                  <label>Status</label>
+                  <select value={clinicForm.status} onChange={(e) => setClinicForm({ ...clinicForm, status: e.target.value })}>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
+                </div>
+                <div className="sa-modal-field" style={{ gridColumn: '1 / -1' }}>
+                  <label>Address</label>
+                  <textarea value={clinicForm.address} onChange={(e) => setClinicForm({ ...clinicForm, address: e.target.value })} />
+                </div>
+              </div>
+            </div>
+            <div className="sa-modal-footer">
+              <button type="button" className="sa-btn-secondary" onClick={() => setEditingClinic(null)}>Cancel</button>
+              <button type="submit" className="sa-btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   )
 }

@@ -2,64 +2,60 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { adminNavigation } from './adminNavigation'
 import './AdminSidebar.css'
 
-function AdminSidebar({ activeLabel, hospitalName = 'Hospital', branchName = 'Branch', adminName = 'Pilla Durga Prasad' }) {
+function AdminSidebar({ activeLabel, hospitalName = 'PMS', branchName = 'Admin Console', adminName = 'Admin' }) {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const initials = adminName
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase() || 'PD'
-
   return (
     <aside className="branch-admin-sidebar" aria-label="Admin navigation">
-      {/* Hospital Logo Header */}
+      {/* Brand Header */}
       <div className="branch-admin-brand" onClick={() => navigate('/admin/dashboard')} role="button" tabIndex={0}>
-        <b className="hospital-cross-badge">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 5v14M5 12h14" />
+        <span className="branch-admin-brand-mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
           </svg>
-        </b>
-        <div className="hospital-brand-info">
-          <strong>{hospitalName}</strong>
-          <small>{branchName}</small>
+        </span>
+        <div className="branch-admin-brand-copy">
+          <strong>PMS</strong>
+          <small>{branchName || 'Admin Console'}</small>
         </div>
       </div>
 
       {/* Main Navigation */}
-      <nav>
+      <nav className="branch-admin-nav">
         {adminNavigation.map(({ label, path, icon, color }) => {
           const isActive = activeLabel === label || location.pathname === path
           return (
             <button
               type="button"
-              className={isActive ? 'active' : ''}
-              style={{ '--accent-color': color }}
+              className={`branch-admin-nav-link nav-color-${color || 'blue'}${isActive ? ' is-active' : ''}`}
               onClick={() => navigate(path)}
               key={label}
             >
-              <span className="sidebar-icon-wrap" style={{ color: color }}>
+              <span className={`nav-icon-badge badge-${color || 'blue'}`}>
                 {icon}
               </span>
-              <span>{label}</span>
+              <span className="nav-label">{label}</span>
             </button>
           )
         })}
       </nav>
 
-      {/* User Profile Card at Bottom */}
-      <div className="branch-admin-sidebar-footer" onClick={() => navigate('/admin/profile')} role="button" tabIndex={0} title="View Profile">
-        <span className="sidebar-avatar-circle">{initials}</span>
-        <div className="sidebar-profile-info">
-          <strong>{adminName}</strong>
-          <small>{branchName}</small>
-          <em className="online-indicator">
-            <i className="pulse-dot" />
-            Online
-          </em>
-        </div>
+      {/* Collapse Menu Button at Bottom */}
+      <div className="branch-admin-sidebar-bottom">
+        <button
+          type="button"
+          className="branch-admin-collapse-btn"
+          onClick={() => {
+            const shell = document.querySelector('.branch-admin-page')
+            if (shell) shell.classList.toggle('sidebar-collapsed')
+          }}
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>Collapse Menu</span>
+        </button>
       </div>
     </aside>
   )

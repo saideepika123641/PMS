@@ -1,34 +1,55 @@
+/* ==========================================================================
+   Admin Sidebar Styling
+   Matches the CMS Admin Console reference design
+   ========================================================================== */
+
 .branch-admin-page {
   min-height: 100vh;
   width: 100%;
   display: block;
-  padding-left: 260px;
-  overflow: hidden;
-  background: #f6f9fc;
+  padding-left: 248px;
+  overflow-x: hidden;
+  background: 
+    radial-gradient(ellipse 70% 55% at 90% 12%, rgba(186, 230, 253, 0.7) 0%, rgba(199, 240, 255, 0.4) 40%, transparent 75%),
+    radial-gradient(ellipse 60% 45% at 95% 45%, rgba(167, 243, 208, 0.3) 0%, rgba(207, 250, 254, 0.25) 35%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 20% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 65%),
+    linear-gradient(145deg, #f2f8fe 0%, #ebf5fc 45%, #e1effa 100%);
+  background-attachment: fixed;
   color: #0f172a;
+  transition: padding-left 0.2s ease;
+  box-sizing: border-box;
+}
+
+.branch-admin-page.sidebar-collapsed {
+  padding-left: 72px;
 }
 
 .branch-admin-sidebar {
-  width: 260px;
+  width: 248px;
   height: 100vh;
+  max-height: 100dvh;
   box-sizing: border-box;
-  background: #ffffff;
-  border-right: 1px solid #e2e8f0;
+  background: #e8f3fc;
+  border-right: 1px solid #d4e5f5;
   display: flex;
   flex-direction: column;
-  padding: 16px 14px;
+  padding: 16px 14px 14px;
   position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
   overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   z-index: 100;
   box-shadow: 1px 0 3px rgba(0, 0, 0, 0.02);
   scrollbar-width: none;
 }
 
 .branch-admin-sidebar::-webkit-scrollbar,
-.branch-admin-sidebar nav::-webkit-scrollbar {
+.branch-admin-nav::-webkit-scrollbar {
   width: 0;
   height: 0;
   display: none;
@@ -39,38 +60,34 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 10px 14px;
-  border-bottom: 1px solid #f1f5f9;
+  padding: 6px 8px 18px;
+  border-bottom: 1px solid #dbeaf6;
+  margin-bottom: 12px;
   cursor: pointer;
 }
 
-.hospital-cross-badge {
-  width: 42px;
-  height: 42px;
-  flex: 0 0 42px;
-  border-radius: 12px;
-  background: #ecfdf5;
-  color: #10b981;
-  border: 1px solid #a7f3d0;
+.branch-admin-brand-mark {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
   display: grid;
   place-items: center;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.12);
-  transition: transform 0.2s ease;
 }
 
-.branch-admin-brand:hover .hospital-cross-badge {
-  transform: scale(1.05);
-}
-
-.hospital-brand-info strong {
+.branch-admin-brand-copy strong {
   display: block;
+  margin: 0;
   color: #0f172a;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
   line-height: 1.2;
 }
 
-.hospital-brand-info small {
+.branch-admin-brand-copy small {
   display: block;
   margin-top: 2px;
   color: #64748b;
@@ -79,196 +96,178 @@
 }
 
 /* Navigation List */
-.branch-admin-sidebar nav {
-  flex: 1;
+.branch-admin-nav {
+  flex: 1 1 auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  margin-top: 10px;
+  gap: 6px;
   overflow-y: auto;
   scrollbar-width: none;
 }
 
-.branch-admin-sidebar nav::before {
-  content: "MAIN MENU";
-  display: block;
-  margin: 6px 10px 8px;
-  color: #94a3b8;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.branch-admin-sidebar nav button {
+.branch-admin-nav-link {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 40px;
-  padding: 8px 12px;
+  min-height: 42px;
+  padding: 6px 12px;
+  margin: 0;
   border: 0;
-  border-radius: 10px;
+  border-radius: 12px;
   background: transparent;
-  color: #475569;
-  font-size: 13.5px;
-  font-weight: 500;
+  color: #334155;
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.2;
   text-align: left;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.16s ease;
 }
 
-.sidebar-icon-wrap {
+.nav-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  transition: transform 0.16s ease;
+}
+
+.nav-icon-badge svg,
+.branch-admin-nav-link svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Pastel Badge Themes */
+.badge-blue { background: #e0f2fe; color: #2563eb; }
+.badge-rose, .badge-pink { background: #fee2e2; color: #f43f5e; }
+.badge-orange { background: #ffedd5; color: #ea580c; }
+.badge-amber, .badge-gold { background: #fef3c7; color: #d97706; }
+.badge-cyan, .badge-sky { background: #e0f2fe; color: #0284c7; }
+.badge-purple, .badge-violet { background: #f3e8ff; color: #9333ea; }
+.badge-green, .badge-mint { background: #dcfce7; color: #16a34a; }
+.badge-red, .badge-coral { background: #fee2e2; color: #ef4444; }
+.badge-teal { background: #ccfbf1; color: #0d9488; }
+.badge-emerald { background: #d1fae5; color: #059669; }
+
+/* Nav Item Colors */
+.branch-admin-nav-link.nav-color-blue .nav-label { color: #2563eb; }
+.branch-admin-nav-link.nav-color-rose .nav-label,
+.branch-admin-nav-link.nav-color-pink .nav-label { color: #f43f5e; }
+.branch-admin-nav-link.nav-color-orange .nav-label { color: #ea580c; }
+.branch-admin-nav-link.nav-color-amber .nav-label,
+.branch-admin-nav-link.nav-color-gold .nav-label { color: #d97706; }
+.branch-admin-nav-link.nav-color-cyan .nav-label,
+.branch-admin-nav-link.nav-color-sky .nav-label { color: #0284c7; }
+.branch-admin-nav-link.nav-color-purple .nav-label,
+.branch-admin-nav-link.nav-color-violet .nav-label { color: #9333ea; }
+.branch-admin-nav-link.nav-color-green .nav-label,
+.branch-admin-nav-link.nav-color-mint .nav-label { color: #059669; }
+.branch-admin-nav-link.nav-color-red .nav-label,
+.branch-admin-nav-link.nav-color-coral .nav-label { color: #ef4444; }
+.branch-admin-nav-link.nav-color-teal .nav-label { color: #0d9488; }
+.branch-admin-nav-link.nav-color-emerald .nav-label { color: #059669; }
+
+.branch-admin-nav-link:hover {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.branch-admin-nav-link:hover .nav-icon-badge {
+  transform: scale(1.05);
+}
+
+.branch-admin-nav-link.is-active {
+  background: #ffffff;
+  color: #2563eb;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+  border-radius: 12px;
+}
+
+.branch-admin-nav-link.is-active .nav-label {
+  color: #2563eb !important;
+}
+
+.branch-admin-nav-link.is-active .badge-blue {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+/* Sidebar Bottom: Collapse Button */
+.branch-admin-sidebar-bottom {
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding: 12px 4px 4px;
+  border-top: 1px solid #dbeaf6;
+}
+
+.branch-admin-collapse-btn {
+  width: 100%;
+  height: 38px;
+  border: 1px solid #d4e5f5;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
-}
-
-.branch-admin-sidebar nav button:hover {
-  background: #f8fafc;
-  color: #0f172a;
-  transform: translateX(2px);
-}
-
-.branch-admin-sidebar nav button:hover .sidebar-icon-wrap {
-  transform: scale(1.08);
-}
-
-.branch-admin-sidebar nav button.active {
-  background: var(--accent-color, #2563eb);
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.18);
-}
-
-.branch-admin-sidebar nav button.active .sidebar-icon-wrap {
-  color: #ffffff !important;
-}
-
-.branch-admin-sidebar nav button.active .sidebar-icon-wrap svg {
-  stroke: #ffffff;
-}
-
-/* User Profile Footer */
-.branch-admin-sidebar-footer {
-  margin-top: auto;
-  padding: 12px 10px;
-  border-top: 1px solid #f1f5f9;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-radius: 12px;
+  gap: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.16s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
-.branch-admin-sidebar-footer:hover {
-  background: #f8fafc;
-}
-
-.sidebar-avatar-circle {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  border-radius: 50%;
-  background: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #bfdbfe;
-  display: grid;
-  place-items: center;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.sidebar-profile-info strong {
-  display: block;
+.branch-admin-collapse-btn:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
   color: #0f172a;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
 }
 
-.sidebar-profile-info small {
-  display: block;
-  margin-top: 2px;
-  color: #64748b;
-  font-size: 11px;
+/* Collapsed Sidebar */
+.branch-admin-page.sidebar-collapsed .branch-admin-sidebar {
+  width: 72px;
+  padding: 16px 8px;
 }
 
-.online-indicator {
-  margin-top: 4px;
-  color: #10b981;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-style: normal;
-  font-weight: 600;
+.branch-admin-page.sidebar-collapsed .branch-admin-brand-copy,
+.branch-admin-page.sidebar-collapsed .nav-label,
+.branch-admin-page.sidebar-collapsed .branch-admin-collapse-btn span {
+  display: none;
 }
 
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  flex: 0 0 8px;
-  border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-  animation: pulseDot 2s infinite;
+.branch-admin-page.sidebar-collapsed .branch-admin-brand {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
 }
 
-@keyframes pulseDot {
-  0% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-  }
-  70% {
-    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
+.branch-admin-page.sidebar-collapsed .branch-admin-nav-link {
+  justify-content: center;
+  padding: 6px 0;
 }
 
-/* Responsive sidebar */
-@media (max-width: 900px) {
+/* Mobile Responsiveness */
+@media (max-width: 1024px) {
   .branch-admin-page {
-    padding-left: 72px;
+    padding-left: 0 !important;
   }
 
   .branch-admin-sidebar {
-    width: 72px;
-    padding-inline: 8px;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  .hospital-brand-info,
-  .branch-admin-sidebar nav::before,
-  .branch-admin-sidebar nav button span,
-  .sidebar-profile-info {
-    display: none;
-  }
-}
-
-@media (max-width: 640px) {
-  .branch-admin-page {
-    display: block;
-    padding-left: 0;
-  }
-
-  .branch-admin-sidebar {
-    width: 260px;
-    transform: translateX(-260px);
-    transition: transform 0.28s ease;
-    z-index: 1100;
-  }
-
-  .branch-admin-sidebar-open .branch-admin-sidebar {
+  .branch-admin-page.branch-admin-sidebar-open .branch-admin-sidebar {
     transform: translateX(0);
-  }
-
-  .branch-admin-sidebar-open .hospital-brand-info,
-  .branch-admin-sidebar-open .branch-admin-sidebar nav::before,
-  .branch-admin-sidebar-open .branch-admin-sidebar nav button span,
-  .branch-admin-sidebar-open .sidebar-profile-info {
-    display: block;
   }
 }

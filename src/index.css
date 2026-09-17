@@ -12,8 +12,13 @@ body {
   min-height: 100vh;
   overflow: hidden;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #fdf0f7;
-  color: #3b1526;
+  background: 
+    radial-gradient(ellipse 70% 55% at 90% 12%, rgba(186, 230, 253, 0.7) 0%, rgba(199, 240, 255, 0.4) 40%, transparent 75%),
+    radial-gradient(ellipse 60% 45% at 95% 45%, rgba(167, 243, 208, 0.3) 0%, rgba(207, 250, 254, 0.25) 35%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 20% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 65%),
+    linear-gradient(145deg, #f2f8fe 0%, #ebf5fc 45%, #e1effa 100%);
+  background-attachment: fixed;
+  color: #0f172a;
   line-height: 1.6;
 }
 
@@ -42,10 +47,51 @@ img {
   height: 100vh;
   min-height: 100vh;
   overflow: hidden;
+  background: transparent;
 }
 
 ::selection {
-  background: rgba(214, 51, 132, 0.18);
+  background: rgba(37, 99, 235, 0.18);
+  color: #1d4ed8;
+}
+
+/* Global Light Sky Blue Sidebar across all modules */
+.super-admin-sidebar,
+.branch-admin-sidebar,
+.pharmacist-sidebar,
+.profile-sidebar,
+.admins-sidebar {
+  background: #e8f3fc !important;
+  border-right: 1px solid #d4e5f5 !important;
+}
+
+/* Global Canvas Background across all application shells */
+.super-admin-shell,
+.branch-admin-page,
+.pharmacist-page,
+.admins-page-shell,
+.reference-dashboard,
+.profile-super-admin-shell,
+.profile-admin-shell,
+.profile-page,
+.medicines-page,
+.clinics-page,
+.settings-page,
+.permissions-shell {
+  background: 
+    radial-gradient(ellipse 70% 55% at 90% 12%, rgba(186, 230, 253, 0.7) 0%, rgba(199, 240, 255, 0.4) 40%, transparent 75%),
+    radial-gradient(ellipse 60% 45% at 95% 45%, rgba(167, 243, 208, 0.3) 0%, rgba(207, 250, 254, 0.25) 35%, transparent 70%),
+    radial-gradient(ellipse 50% 35% at 20% 0%, rgba(219, 234, 254, 0.55) 0%, transparent 65%),
+    linear-gradient(145deg, #f2f8fe 0%, #ebf5fc 45%, #e1effa 100%) !important;
+  background-attachment: fixed !important;
+}
+
+.super-admin-main,
+.branch-admin-main,
+.pharmacist-main,
+.admins-main,
+.profile-main {
+  background: transparent !important;
 }
 
 /* Layout fixed-outer and scrolling-inner styling */
@@ -187,6 +233,8 @@ img {
   display: block !important;
   overflow: visible !important;
   height: auto !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 /* 4. Pharmacist Layouts */
@@ -221,11 +269,14 @@ img {
   overflow-x: hidden !important;
   padding: 0 20px 28px !important;
 }
-.pharmacist-content.is-dashboard .pharmacist-panel {
+.pharmacist-content.is-dashboard .pharmacist-panel,
+.pharmacist-dashboard-container .pharmacist-panel {
   flex: none !important;
   display: block !important;
   overflow: visible !important;
   height: auto !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 /* 5. Shared Admin/Pharmacist Panel list scrolling components */

@@ -1,113 +1,123 @@
+/* ==========================================================================
+   Admin Topbar Styling
+   Matches the CMS Admin Console reference topbar design
+   ========================================================================== */
+
 .branch-admin-main {
   width: 100%;
   min-width: 0;
   height: 100vh;
   overflow-y: auto;
   overflow-x: hidden;
-  background: #f6f9fc;
-  padding: 0 24px 28px;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  background: transparent;
+  padding: 0 32px 40px !important;
+  scrollbar-width: none;
+  box-sizing: border-box;
 }
 
 .branch-admin-main::-webkit-scrollbar {
-  width: 6px;
-}
-
-.branch-admin-main::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-.branch-admin-main::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .branch-admin-content {
-  padding-top: 24px;
+  padding-top: 16px;
 }
 
 /* Sticky Header */
 .branch-admin-header {
   height: 76px;
+  min-height: 76px;
   background: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid #edf2f7;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 0 24px;
+  gap: 20px;
+  padding: 0 32px 0 24px;
   box-sizing: border-box;
   position: sticky;
   top: 0;
   z-index: 90;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  margin: 0 -32px;
 }
 
 .branch-admin-menu {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: none;
-  color: #0f172a;
-}
-
-.branch-admin-top-search {
-  position: relative;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
-  background: #f1f5f9;
-  padding: 0 16px;
-  height: 44px;
-  border-radius: 12px;
-  width: min(640px, 100%);
-  gap: 10px;
-  border: 1px solid #e2e8f0;
-  color: #64748b;
-  flex: 1;
-  transition: all 0.2s ease;
+  justify-content: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #334155;
+  cursor: pointer;
+  transition: background 0.16s ease;
+  flex: 0 0 auto;
 }
 
-.branch-admin-top-search:focus-within {
-  background: #ffffff;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+.branch-admin-menu:hover {
+  background: #f1f5f9;
 }
 
 .branch-admin-icon {
-  width: 20px;
-  height: 20px;
   stroke: currentColor;
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+  width: 20px;
+  height: 20px;
+}
+
+.branch-admin-top-search {
+  position: relative;
+  height: 48px;
+  width: min(840px, calc(100% - 240px));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
+  background: #f1f5f9;
+  color: #64748b;
+  flex: 1 1 auto;
+  transition: all 0.16s ease;
+}
+
+.branch-admin-top-search:focus-within {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
 }
 
 .branch-admin-top-search .branch-admin-icon {
   width: 16px;
   height: 16px;
   flex: 0 0 16px;
-  color: #94a3b8;
 }
 
 .branch-admin-top-search input {
-  border: none;
-  outline: none;
-  background: transparent;
   width: 100%;
-  font-size: 13.5px;
-  color: #0f172a;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #334155;
+  font-size: 14px;
 }
 
 .branch-admin-top-search input::placeholder {
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .search-shortcut-badge {
   font-size: 11px;
   font-weight: 600;
-  color: #64748b;
-  background: #e2e8f0;
+  color: #94a3b8;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   padding: 2px 7px;
   border-radius: 6px;
   white-space: nowrap;
@@ -117,12 +127,12 @@
 .branch-admin-search-results {
   position: absolute;
   z-index: 20;
-  top: 50px;
+  top: 56px;
   left: 0;
   right: 0;
   padding: 6px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
+  border: 1px solid #dbe3ed;
+  border-radius: 10px;
   background: #ffffff;
   box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
 }
@@ -142,9 +152,13 @@
   text-align: left;
 }
 
+.branch-admin-search-results button {
+  cursor: pointer;
+}
+
 .branch-admin-search-results button:hover {
-  background: #eff6ff;
-  color: #2563eb;
+  background: #eef6f6;
+  color: #0f766e;
 }
 
 .branch-admin-search-results span {
@@ -154,33 +168,35 @@
 .header-right-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
+  margin-left: 20px;
+  flex: 0 0 auto;
 }
 
 .branch-admin-notification {
   position: relative;
-  cursor: pointer;
-  color: #64748b;
-  width: 40px;
-  height: 40px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: #ffffff;
+  width: 44px;
+  height: 44px;
   display: grid;
   place-items: center;
-  flex: 0 0 auto;
-  transition: all 0.2s ease;
+  border: 1px solid #edf2f7;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #1e293b;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.16s ease;
+  flex: 0 0 44px;
 }
 
 .branch-admin-notification:hover {
   background: #f8fafc;
-  color: #0f172a;
   border-color: #cbd5e1;
 }
 
 .branch-admin-notification .branch-admin-icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
 }
 
 .unread-dot {
@@ -198,87 +214,4 @@
 .branch-admin-header .admin-profile {
   display: flex;
   align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  position: relative;
-  min-height: 44px;
-  padding: 4px 12px 4px 6px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  background: #ffffff;
-  color: #0f172a;
-  box-shadow: none;
-  transition: all 0.2s ease;
-}
-
-.branch-admin-header .user-profile-chip:hover,
-.branch-admin-header .admin-profile:hover {
-  border-color: #cbd5e1;
-  background: #f8fafc;
-}
-
-.branch-admin-header .user-profile-avatar,
-.branch-admin-header .admin-profile .profile-avatar {
-  width: 34px;
-  height: 34px;
-  background: #eff6ff;
-  color: #2563eb;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 13px;
-}
-
-@media (max-width: 768px) {
-  .branch-admin-header {
-    padding: 0 14px;
-  }
-
-  .branch-admin-menu {
-    display: block;
-  }
-
-  .branch-admin-top-search {
-    width: 100%;
-    height: 40px;
-  }
-
-  .search-shortcut-badge {
-    display: none;
-  }
-}
-
-/* Shared blue profile and notification controls */
-.branch-admin-notification {
-  width: 70px;
-  height: 70px;
-  border: 1px solid #e0e9f3;
-  border-radius: 50%;
-  background: #f8fbff;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
-}
-.branch-admin-header .user-profile-chip,
-.branch-admin-header .admin-profile { min-height: 62px; }
-.branch-admin-header .user-profile-avatar,
-.branch-admin-header .admin-profile .profile-avatar { border-radius: 50%; }
-.branch-admin-header .user-profile-online-dot { display: block; }
-.branch-admin-header .user-profile-chip,
-.branch-admin-header .admin-profile {
-  min-width: 112px;
-  height: 62px;
-  border: 4px solid #92c5ff;
-  border-radius: 999px;
-  background: #d7eaff;
-  color: #0d2745;
-  box-shadow: 0 0 0 5px rgba(147, 197, 253, 0.28);
-}
-.branch-admin-header .user-profile-avatar,
-.branch-admin-header .admin-profile .profile-avatar {
-  width: 44px;
-  height: 44px;
-  background: radial-gradient(circle at 35% 25%, #88b8ff 0, #527df2 44%, #3159db 100%);
-  color: #ffffff;
-  font-size: 16px;
 }

@@ -5,6 +5,7 @@ import { changePharmacyAdminPassword, changeSignedInPharmacistPassword, changeSu
 import SuperAdminSidebar from './SuperAdminSidebar'
 import SuperAdminTopbar from './SuperAdminTopbar'
 import PharmacistSidebar from '../Pharmacist/PharmacistSidebar'
+import UserProfileMenu from '../../components/UserProfileMenu'
 import './SuperAdminTopbar.css'
 import './SuperAdminProfile.css'
 
@@ -169,9 +170,16 @@ export default function SuperAdminProfile({ initialTab = 'profile', roleType = '
       <main className="profile-main">
         {isPharmacyAdmin || isPharmacist ? (
           <header className="profile-topbar">
-            <label className="profile-search"><Icon><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></Icon><input placeholder={isPharmacist ? "Search dashboard, pending, dispensing, reports..." : "Search dashboard, clinics, admins, reports..."} /></label>
-            <button className="profile-bell" type="button"><Icon><path d="M6 9a6 6 0 0 1 12 0c0 7 2 7 2 9H4c0-2 2-2-2-9" /><path d="M10 21h4" /></Icon><b>{isPharmacist ? '3' : '1'}</b></button>
-            <button className="profile-pill" type="button"><span>{initials}</span><i />v</button>
+            <label className="profile-search"><Icon><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></Icon><input placeholder={isPharmacist ? "Search dashboard, pending, dispensing, reports..." : "Search dashboard, branches, admins, reports..."} /></label>
+            <button
+              className="profile-bell"
+              type="button"
+              onClick={() => navigate(isPharmacist ? '/pharmacist/dashboard' : '/admin/expiry-alerts')}
+              aria-label="View notifications"
+            >
+              <Icon><path d="M6 9a6 6 0 0 1 12 0c0 7 2 7 2 9H4c0-2 2-2-2-9" /><path d="M10 21h4" /></Icon>
+            </button>
+            <UserProfileMenu roleType={roleType} />
           </header>
         ) : (
           <SuperAdminTopbar onMenu={() => setSidebarOpen((value) => !value)} />

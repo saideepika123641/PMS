@@ -578,7 +578,7 @@ export default function StockTransfers() {
                             </button>
                             <button 
                               type="button" 
-                              className="admin-action-button assien" 
+                              className="admin-action-button assign" 
                               aria-label="Dispatch Stock" 
                               title="Dispatch Stock"
                               onClick={() => handleDispatch(item?._id || item?.id)}
@@ -587,7 +587,7 @@ export default function StockTransfers() {
                             </button>
                             <button 
                               type="button" 
-                              className="admin-action-button assien" 
+                              className="admin-action-button assign" 
                               style={{ color: '#10b981', borderColor: '#a7f3d0', background: '#ecfdf5' }}
                               aria-label="Receive Stock" 
                               title="Receive Stock"
@@ -597,7 +597,7 @@ export default function StockTransfers() {
                             </button>
                             <button 
                               type="button" 
-                              className="admin-action-button daneer" 
+                              className="admin-action-button danger" 
                               aria-label="Cancel Transfer" 
                               title="Cancel Transfer"
                               onClick={() => handleCancel(item?._id || item?.id)}
