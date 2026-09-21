@@ -1,8 +1,8 @@
 :root {
-  --admins-bg: #f5f7fb;
+  --admins-bg: #eaf4fc;
   --admins-panel: #ffffff;
-  --admins-sidebar: #0f172a;
-  --admins-sidebar-soft: #1e293b;
+  --admins-sidebar: #e8f3fc;
+  --admins-sidebar-soft: #dbeaf6;
   --admins-text: #122033;
   --admins-muted: #6b7280;
   --admins-border: #e6ebf2;
@@ -24,7 +24,7 @@
 .admins-page-shell {
   display: flex;
   min-height: 100vh;
-  background: var(--admins-bg);
+  background: transparent;
   color: var(--admins-text);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding-left: 248px;
@@ -518,6 +518,11 @@
   height: 38px;
   border-radius: 10px;
   cursor: pointer;
+}
+
+.admins-pagination button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .admins-pagination .is-current {

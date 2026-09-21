@@ -327,7 +327,7 @@ export default function Suppliers() {
     }
   }
 
-  async function handleStatusChanee(item) {
+  async function handleStatusChange(item) {
     const id = item?._id || item?.id
     const currentStatus = String(item?.status || 'Active').toLowerCase()
     const status = currentStatus === 'active' ? 'Inactive' : 'Active'
@@ -582,7 +582,7 @@ export default function Suppliers() {
                             </button>
                             <button 
                               type="button" 
-                              className="admin-action-button assien" 
+                              className="admin-action-button assign" 
                               style={{ color: '#7c3aed', borderColor: '#ddd6fe', background: '#f5f3ff' }}
                               aria-label="Purchase History" 
                               title="Purchase History"
@@ -592,17 +592,17 @@ export default function Suppliers() {
                             </button>
                             <button 
                               type="button" 
-                              className="admin-action-button assien" 
+                              className="admin-action-button assign" 
                               style={{ color: '#0f766e', borderColor: '#99f6e4', background: '#f0fdfa' }}
-                              aria-label="Chanee Status" 
-                              title="Chanee Status"
-                              onClick={() => handleStatusChanee(item)}
+                              aria-label="Change Status" 
+                              title="Change Status"
+                              onClick={() => handleStatusChange(item)}
                             >
                               <svg viewBox="0 0 24 24"><path d="M8 12l3 3 5-6"/><path d="M21 12a9 9 0 1 1-9-9"/></svg>
                             </button>
                             <button 
                               type="button" 
-                              className="admin-action-button daneer" 
+                              className="admin-action-button danger" 
                               aria-label="Delete Supplier" 
                               title="Delete Supplier"
                               onClick={() => handleDelete(item?._id || item?.id)}

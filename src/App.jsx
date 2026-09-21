@@ -12,7 +12,6 @@ import Reports from './pages/Super Admin/Reports'
 import ActivityLogs from './pages/Super Admin/Audit Logs'
 import Notifications from './pages/Super Admin/Notifications'
 import Admins from './pages/Super Admin/Admins'
-import Clinics from './pages/Super Admin/Clinics'
 import Branches from './pages/Super Admin/Branches'
 import SuperAdminProfile from './pages/Super Admin/SuperAdminProfile'
 import AdminDashboard from './pages/Admin/AdminDashboard'
@@ -46,10 +45,13 @@ function App() {
         <Routes>
           <Route path="/" element={<PmsLanding />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/super-admin" element={<Navigate to="/super-admin/dashboard" replace />} />
+          <Route path="/superadmin" element={<Navigate to="/super-admin/dashboard" replace />} />
+          <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
           <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
           <Route path="/super-admin/admins" element={<Admins />} />
-          <Route path="/super-admin/clinics/add" element={<Clinics />} />
-          <Route path="/super-admin/clinics" element={<Clinics />} />
+          <Route path="/super-admin/clinics/add" element={<Navigate to="/super-admin/branches" replace />} />
+          <Route path="/super-admin/clinics" element={<Navigate to="/super-admin/branches" replace />} />
           <Route path="/super-admin/branches" element={<Branches />} />
           <Route path="/super-admin/users-permissions" element={<UsersPermissions />} />
           <Route path="/super-admin/medicines" element={<Medicines />} />
@@ -63,8 +65,10 @@ function App() {
           <Route path="/change-password" element={<SuperAdminProfile initialTab="password" />} />
           <Route path="/super-admin/profile" element={<SuperAdminProfile initialTab="profile" />} />
           <Route path="/super-admin/change-password" element={<SuperAdminProfile initialTab="password" />} />
+          <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/users/add" element={<AdminUsers initialAdd={true} />} />
           <Route path="/admin/medicines" element={<AdminMedicines />} />
           <Route path="/admin/stock" element={<AdminStock />} />
           <Route path="/inventory" element={<AdminStock initialView="inventory" />} />

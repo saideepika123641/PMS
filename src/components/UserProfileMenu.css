@@ -3,21 +3,26 @@
 }
 
 .user-profile-chip {
-  min-width: 112px;
-  height: 62px;
-  border: 4px solid #92c5ff;
+  min-width: auto;
+  height: 48px;
+  border: 1.5px solid #bfdbfe;
   border-radius: 999px;
-  background: #d7eaff;
-  color: #0d2745;
-  display: flex;
+  background: #eff6ff;
+  color: #0f172a;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 6px 16px 6px 10px;
+  gap: 10px;
+  padding: 4px 14px 4px 6px;
   cursor: pointer;
-  box-shadow: 0 0 0 5px rgba(147, 197, 253, 0.28);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.05);
   font-family: inherit;
   box-sizing: border-box;
+  transition: all 0.16s ease;
+}
+
+.user-profile-chip:hover {
+  background: #e0f2fe;
+  border-color: #93c5fd;
 }
 
 .user-profile-chip.open .user-profile-chevron {
@@ -26,56 +31,65 @@
 
 .user-profile-avatar-shell {
   position: relative;
-  width: 46px;
-  height: 46px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  flex: 0 0 46px;
+  flex: 0 0 36px;
 }
 
 .user-profile-avatar {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 25%, #88b8ff 0, #527df2 44%, #3159db 100%);
-  border: 3px solid rgba(255, 255, 255, 0.72);
+  background: #2563eb;
+  border: 0;
   display: grid;
   place-items: center;
   color: #ffffff;
-  font-weight: 800;
-  font-size: 16px;
-  box-shadow: 0 6px 16px rgba(49, 89, 219, 0.24), inset 0 1px 4px rgba(255, 255, 255, 0.38);
+  font-weight: 700;
+  font-size: 13px;
   box-sizing: border-box;
 }
 
 .user-profile-online-dot {
   position: absolute;
   right: -1px;
-  bottom: 2px;
-  width: 15px;
-  height: 15px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  border: 3px solid #ffffff;
-  background: #18c77a;
+  border: 2px solid #ffffff;
+  background: #22c55e;
 }
 
 .user-profile-copy {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  clip-path: inset(50%);
-  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: left;
+  line-height: 1.25;
+}
+
+.user-profile-copy strong {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.user-profile-copy em {
+  color: #64748b;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
 }
 
 .user-profile-chevron {
-  color: #0d2745;
+  color: #64748b;
   transition: transform 0.16s ease;
   flex: 0 0 auto;
-  stroke-width: 3;
+  stroke-width: 2.2;
 }
 
 .user-profile-dropdown {

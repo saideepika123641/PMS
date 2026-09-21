@@ -29,34 +29,50 @@ function SuperAdminSidebar({ activeLabel = '' }) {
   return (
     <aside className="super-admin-sidebar" aria-label="Super admin navigation">
       <div className="super-admin-brand">
-        <span className="super-admin-brand-mark">PMS</span>
-        <div>
+        <span className="super-admin-brand-mark">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
+        </span>
+        <div className="super-admin-brand-copy">
           <strong>PMS</strong>
-          <small>Super Admin Console</small>
+          <small>Admin Console</small>
         </div>
       </div>
 
       <nav className="super-admin-nav">
-        {superAdminNavigation.map(({ label, path, icon }) => (
-          <button
-            type="button"
-            className={`super-admin-nav-link${location.pathname === path || label === activeLabel ? ' is-active' : ''}`}
-            onClick={() => navigate(path)}
-            key={label}
-          >
-            {icon}
-            <span>{label}</span>
-          </button>
-        ))}
+        {superAdminNavigation.map(({ label, path, icon, color }) => {
+          const isActive = location.pathname === path || label === activeLabel
+          return (
+            <button
+              type="button"
+              className={`super-admin-nav-link nav-color-${color || 'blue'}${isActive ? ' is-active' : ''}`}
+              onClick={() => navigate(path)}
+              key={label}
+            >
+              <span className={`nav-icon-badge badge-${color || 'blue'}`}>
+                {icon}
+              </span>
+              <span className="nav-label">{label}</span>
+            </button>
+          )
+        })}
       </nav>
 
-      <div className="super-admin-sidebar-footer">
-        <span>{initials(name)}</span>
-        <div>
-          <strong>{name}</strong>
-          <small>Super Admin</small>
-          <em><i />Online</em>
-        </div>
+      <div className="super-admin-sidebar-bottom">
+        <button
+          type="button"
+          className="super-admin-collapse-btn"
+          onClick={() => {
+            const shell = document.querySelector('.super-admin-shell')
+            if (shell) shell.classList.toggle('sidebar-collapsed')
+          }}
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>Collapse Menu</span>
+        </button>
       </div>
     </aside>
   )

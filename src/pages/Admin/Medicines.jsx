@@ -79,7 +79,7 @@ function getStatus(item) {
 }
 
 function optionValue(item) {
-  if (typeof item === 'strine') return item
+  if (typeof item === 'string') return item
   return item?.name || item?.category || item?.dosageForm || item?.value || item?.label || ''
 }
 
@@ -95,12 +95,12 @@ export default function Medicines() {
   const [dosageForm, setDosageForm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [loading, setLoading] = useState(true)
-  const [savine, setSavine] = useState(false)
-  const [editing, setEditine] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [editing, setEditing] = useState(null)
   
   // Modals state
   const [formOpen, setFormOpen] = useState(false)
-  const [viewingItem, setViewineItem] = useState(null)
+  const [viewingItem, setViewingItem] = useState(null)
   const [importOpen, setImportOpen] = useState(false)
   const [showSuccessAnim, setShowSuccessAnim] = useState(false)
   
@@ -289,13 +289,13 @@ export default function Medicines() {
   }, [category, dosageForm, medicines, query, statusFilter])
 
   function openCreate() {
-    setEditine(null)
+    setEditing(null)
     setForm(emptyForm)
     setFormOpen(true)
   }
 
   function openEdit(medicine) {
-    setEditine(medicine)
+    setEditing(medicine)
     setForm({
       name: getName(medicine),
       genericName: medicine?.genericName || '',
@@ -328,7 +328,7 @@ export default function Medicines() {
  
     if (!validateForm()) return
  
-    setSavine(true)
+    setSaving(true)
  
     const payload = {
       name: form.name?.trim(),
@@ -374,7 +374,7 @@ export default function Medicines() {
  
         setFormOpen(false)
 
-        setEditine(null)
+        setEditing(null)
 
         setForm(emptyForm)
 
@@ -420,7 +420,7 @@ export default function Medicines() {
 
     } finally {
 
-        setSavine(false)
+        setSaving(false)
 
     }
 
@@ -553,7 +553,7 @@ export default function Medicines() {
   }
 
   return (
-    <AdminLayout activeLabel="Medicines" title="Medicine Manaeement" subtitle="Manaee medicines, dosage forms, pricing, stock, and medicine catalogue information.">
+    <AdminLayout activeLabel="Medicines" title="Medicine Management" subtitle="Manage medicines, dosage forms, pricing, stock, and medicine catalogue information.">
       <div className="stock-scroll-area">
         <div className="med-layout-container">
 
@@ -739,7 +739,7 @@ export default function Medicines() {
                               className="admin-action-button view" 
                               aria-label="View Medicine" 
                               title="View Medicine"
-                              onClick={() => setViewineItem(medicine)}
+                              onClick={() => setViewingItem(medicine)}
                             >
                               <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
                             </button>
@@ -754,7 +754,7 @@ export default function Medicines() {
                             </button>
                             <button 
                               type="button" 
-                              className="admin-action-button daneer" 
+                              className="admin-action-button danger" 
                               aria-label="Delete Medicine" 
                               title="Delete Medicine"
                               onClick={() => handleDelete(medicine)}
@@ -1261,16 +1261,16 @@ export default function Medicines() {
                     type="button" 
                     className="med-btn-cancel" 
                     onClick={() => setFormOpen(false)}
-                    disabled={savine}
+                    disabled={saving}
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit" 
                     className="med-btn-save" 
-                    disabled={savine}
+                    disabled={saving}
                   >
-                    {savine ? (
+                    {saving ? (
                       <>
                         <svg className="spinner-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" opacity="0.3"/><path fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                         Saving...
@@ -1292,7 +1292,7 @@ export default function Medicines() {
               <div className="med-modal-container">
                 <div className="med-modal-header">
                   <h2>Medicine Details Profile: {getName(viewingItem)}</h2>
-                  <button type="button" className="med-modal-close" onClick={() => setViewineItem(null)}>&times;</button>
+                  <button type="button" className="med-modal-close" onClick={() => setViewingItem(null)}>&times;</button>
                 </div>
                 <div className="med-modal-body">
                   <div className="med-detail-row">
@@ -1369,7 +1369,7 @@ export default function Medicines() {
                   )}
                 </div>
                 <div className="med-modal-footer">
-                  <button type="button" className="med-btn med-btn-primary" onClick={() => setViewineItem(null)}>Close</button>
+                  <button type="button" className="med-btn med-btn-primary" onClick={() => setViewingItem(null)}>Close</button>
                 </div>
               </div>
             </div>

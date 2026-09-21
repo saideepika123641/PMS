@@ -77,6 +77,10 @@ function Notifications() {
   const visibleItems = filteredItems.slice(0, page * PAGE_SIZE)
   const unreadCount = items.filter((item) => item.status === 'unread').length
 
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('pms:notifications-updated', { detail: { unreadCount } }))
+  }, [unreadCount])
+
   function setField(field, value) {
     setForm((current) => ({ ...current, [field]: value }))
   }

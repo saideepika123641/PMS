@@ -1,17 +1,65 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import UserProfileMenu from '../../components/UserProfileMenu'
 import { superAdminNavigation } from '../../components/superAdminNavigation'
+import { listSuperAdminNotifications } from '../../config/api'
 import './SuperAdminTopbar.css'
 
 function Icon({ children }) {
   return <svg className="super-admin-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">{children}</svg>
 }
 
-function SuperAdminTopbar({ onMenu, placeholder = 'Search dashboard, clinics, admins, reports...' }) {
+function listFrom(response) {
+  if (Array.isArray(response)) return response
+  return ['data', 'items', 'results', 'notifications', 'records'].reduce(
+    (list, key) => list.length ? list : (Array.isArray(response?.[key]) ? response[key] : []),
+    []
+  )
+}
+
+function SuperAdminTopbar({ onMenu, placeholder = 'Search dashboard, branches, admins, reports...' }) {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [showResults, setShowResults] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    let active = true
+
+    function syncCount() {
+      listSuperAdminNotifications()
+        .then((response) => {
+          if (!active) return
+          const items = listFrom(response)
+          const count = items.filter((item) => {
+            const state = String(
+              item?.status || item?.state || (item?.read || item?.isRead ? 'read' : 'unread')
+            ).toLowerCase()
+            return state === 'unread'
+          }).length
+          setUnreadCount(count)
+        })
+        .catch(() => {
+          if (active) setUnreadCount(0)
+        })
+    }
+
+    syncCount()
+
+    function handleNotificationEvent(event) {
+      if (typeof event?.detail?.unreadCount === 'number') {
+        setUnreadCount(event.detail.unreadCount)
+      } else {
+        syncCount()
+      }
+    }
+
+    window.addEventListener('pms:notifications-updated', handleNotificationEvent)
+    return () => {
+      active = false
+      window.removeEventListener('pms:notifications-updated', handleNotificationEvent)
+    }
+  }, [])
 
   const results = useMemo(() => {
     const value = query.trim().toLowerCase()
@@ -70,7 +118,7 @@ function SuperAdminTopbar({ onMenu, placeholder = 'Search dashboard, clinics, ad
       <div className="super-admin-topbar-right">
         <button className="super-admin-topbar-notification" type="button" aria-label="Notifications" onClick={() => navigate('/super-admin/notifications')}>
           <Icon><path d="M6 9a6 6 0 0 1 12 0c0 7 2 7 2 9H4c0-2 2-2 2-9" /><path d="M10 21h4" /></Icon>
-          <b>1</b>
+          {unreadCount > 0 ? <b>{unreadCount > 99 ? '99+' : unreadCount}</b> : null}
         </button>
         <UserProfileMenu roleType="super-admin" />
       </div>
@@ -79,4 +127,5 @@ function SuperAdminTopbar({ onMenu, placeholder = 'Search dashboard, clinics, ad
 }
 
 export default SuperAdminTopbar
+
 

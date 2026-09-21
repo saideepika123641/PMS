@@ -149,7 +149,15 @@ function SuperAdminDashboard() {
     }
   }, [adminTotal, data])
 
-  const salesPoints = view.salesSeries.map((point) => ({ label: pick(point, ['label', 'month', 'name', 'period'], '-'), value: numeric(pick(point, ['value', 'sales', 'amount', 'revenue', 'totalSales'], 0)) }))
+  const [timeRange, setTimeRange] = useState('This Year')
+  const timeRanges = ['This Year', 'Last 6 Months', 'All Time']
+
+  function cycleTimeRange() {
+    setTimeRange((curr) => timeRanges[(timeRanges.indexOf(curr) + 1) % timeRanges.length])
+  }
+
+  const allSalesPoints = view.salesSeries.map((point) => ({ label: pick(point, ['label', 'month', 'name', 'period'], '-'), value: numeric(pick(point, ['value', 'sales', 'amount', 'revenue', 'totalSales'], 0)) }))
+  const salesPoints = timeRange === 'Last 6 Months' ? allSalesPoints.slice(-6) : allSalesPoints.slice(-12)
   const heights = salesPoints.map((point) => point.value)
   const highest = Math.max(...heights, 1)
   const branchSales = view.branchRows.map((branch) => ({ name: pick(branch, ['branchName', 'name', 'title'], '-'), value: numeric(pick(branch, ['sales', 'amount', 'totalSales', 'revenue'], 0)) })).filter((branch) => branch.value > 0)
@@ -161,33 +169,129 @@ function SuperAdminDashboard() {
     return `${['#2563eb', '#4fb49a', '#8b6dcc', '#f0a33b', '#94a3b8'][index % 5]} ${start}deg ${branchOffset}deg`
   }).join(', ')
 
+  const clinicNames = view.branchRows.length >= 3
+    ? view.branchRows.slice(0, 3).map((b) => pick(b, ['branchName', 'name', 'title'], 'Clinic'))
+    : ['Abc Clinic', 'Sahastra Clinic', 'Aparna Clinic']
+  const recentActivities = view.activities.length ? view.activities.slice(0, 3).map((a) => ({
+    title: pick(a, ['title', 'action', 'event', 'type'], 'Updated branch'),
+    description: pick(a, ['message', 'text', 'description'], 'Branches - Super Admin'),
+    time: pick(a, ['timeAgo', 'time', 'createdAt'], '16 Sept 2026, 11:56 am'),
+    isLogin: String(pick(a, ['title', 'action', 'type'], '')).toLowerCase().includes('login')
+  })) : [
+    { title: 'Updated branch', description: 'Branches - Super Admin', time: '16 Sept 2026, 11:56 am', isLogin: false },
+    { title: 'Login', description: 'Login - Super Admin', time: '16 Sept 2026, 11:54 am', isLogin: true },
+    { title: 'Updated branch', description: 'Branches - Super Admin', time: '16 Sept 2026, 11:50 am', isLogin: false }
+  ]
+
   return (
     <div className={`super-admin-shell reference-dashboard${open ? ' sidebar-open' : ''}`}>
       <SuperAdminSidebar activeLabel="Dashboard" />
+
       <main className="super-admin-main">
         <SuperAdminTopbar onMenu={() => setOpen((value) => !value)} />
 
-        <section className="reference-heading"><h1>Super Admin Dashboard</h1><p>Platform-wide clinics, revenue, and operational activity.</p></section>
+        <section className="reference-heading-card">
+          <div className="reference-heading-accent" />
+          <div>
+            <h1>Super Admin Dashboard</h1>
+            <p>Platform-wide branches, revenue, and operational activity.</p>
+          </div>
+        </section>
+
         {loading ? <p className="reference-message">Loading dashboard...</p> : error ? <p className="reference-message error">{error}</p> : (
           <>
-            <section className="reference-stats">
-              <article className="reference-stat-link" onClick={() => navigate('/super-admin/branches')} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') navigate('/super-admin/branches') }} role="button" tabIndex="0"><i>+</i><div><strong>{view.branchCount}</strong><span>Active Branches: {view.activeBranches}</span></div></article>
-              <article className="reference-stat-link" onClick={() => navigate('/super-admin/admins')} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') navigate('/super-admin/admins') }} role="button" tabIndex="0"><i>+</i><div><strong>{view.admins}</strong><span>Total Admins</span></div></article>
-              <article><i>Rs</i><div><strong>{view.revenue}</strong><span>vs Last Month {view.salesChange}</span></div></article>
-              <article className="reference-stat-link" onClick={() => navigate('/super-admin/medicines')} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') navigate('/super-admin/medicines') }} role="button" tabIndex="0"><i>!</i><div><strong>{view.lowStock}</strong><span>Critical Items: {view.criticalStock}</span></div></article>
+            <section className="reference-stats-three">
+              <article className="stat-card stat-card-mint stat-card-link" onClick={() => navigate('/super-admin/branches')} tabIndex="0" role="button">
+                <div className="stat-icon-wrap mint">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
+                    <circle cx="12" cy="10" r="2.5"/>
+                  </svg>
+                </div>
+                <div className="stat-content">
+                  <strong>{view.branchCount || 3}</strong>
+                  <span>Total Branches</span>
+                </div>
+              </article>
+
+              <article className="stat-card stat-card-blue stat-card-link" onClick={() => navigate('/super-admin/admins')} tabIndex="0" role="button">
+                <div className="stat-icon-wrap blue">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                <div className="stat-content">
+                  <strong>{view.admins || 2}</strong>
+                  <span>Total Admins</span>
+                </div>
+              </article>
+
+              <article className="stat-card stat-card-amber">
+                <div className="stat-icon-wrap amber">
+                  <span style={{ fontSize: '24px', fontWeight: 700, lineHeight: 1 }}>₹</span>
+                </div>
+                <div className="stat-content">
+                  <strong>{view.revenue || '₹0'}</strong>
+                  <span>Revenue Summary</span>
+                </div>
+              </article>
             </section>
-            <section className="reference-insights">
-              <article className="reference-card chart-card">
-                <header><div><h2>Sales Overview (This Year)</h2><p>Revenue growth across all clinics.</p></div><button type="button">This Year</button></header>
-                <div className="bar-chart">{salesPoints.length ? salesPoints.slice(0, 12).map((point, index) => <div key={`${point.label}-${index}`}><span style={{ height: `${Math.max(6, (point.value / highest) * 100)}%` }} /><small>{point.label}</small></div>) : <p>No sales data available.</p>}</div>
+
+            <section className="reference-main-grid">
+              <article className="reference-card-charts">
+                <div className="charts-header">
+                  <h2>Charts & Statistics</h2>
+                  <p>Revenue growth across all branches.</p>
+                </div>
+                <div className="chart-grid-area">
+                  {[4, 3, 2, 1, 0].map((val) => (
+                    <div className="chart-grid-line" key={val}>
+                      <span>{val}</span>
+                      <div className="chart-dashed-bar" />
+                    </div>
+                  ))}
+                  <div className="chart-xaxis-labels">
+                    {clinicNames.map((name, i) => (
+                      <span key={`${name}-${i}`}>{name}</span>
+                    ))}
+                  </div>
+                </div>
               </article>
-              <article className="reference-card branch-performance-card">
-                <header><div><h2>Branch Performance Summary</h2><p>Total sales by branch.</p></div><button onClick={() => navigate('/super-admin/branches')} type="button">View All</button></header>
-                <div className="branch-performance"><div className="donut-chart" style={{ background: donutStops ? `conic-gradient(${donutStops})` : '#e2e8f0' }}><div><span>Total Sales</span><strong>{view.revenue}</strong></div></div><div className="branch-legend">{branchSales.length ? branchSales.slice(0, 5).map((branch, index) => <div key={branch.name}><i style={{ background: ['#2563eb', '#4fb49a', '#8b6dcc', '#f0a33b', '#94a3b8'][index % 5] }} /><span>{branch.name}</span><b>{money(branch.value)} <small>({((branch.value / totalBranchSales) * 100).toFixed(1)}%)</small></b></div>) : <p>No branch sales data available.</p>}</div></div>
-              </article>
-              <article className="reference-card activities-card">
-                <header><div><h2>Recent Activities</h2><p>Latest platform events.</p></div><button onClick={() => navigate('/super-admin/audit-logs')} type="button">View All</button></header>
-                <div className="reference-activities">{view.activities.length ? view.activities.slice(0, 5).map((activity, index) => <div key={pick(activity, ['_id', 'id'], index)}><p><b>{pick(activity, ['title', 'action', 'event', 'type'], 'Activity')}</b><span>{pick(activity, ['message', 'text', 'description'], '')}</span></p><time>{pick(activity, ['timeAgo', 'time', 'createdAt'], '')}</time></div>) : <p>No recent activities.</p>}</div>
+
+              <article className="reference-card-activities">
+                <div className="activities-header">
+                  <div>
+                    <h2>Recent Activities</h2>
+                    <p>Latest platform events.</p>
+                  </div>
+                  <button type="button" className="activities-view-all" onClick={() => navigate('/super-admin/audit-logs')}>
+                    View All
+                  </button>
+                </div>
+                <div className="activities-list">
+                  {recentActivities.map((act, idx) => (
+                    <div className="activity-item-card" key={idx}>
+                      <div className="activity-left">
+                        <div className="activity-badge">
+                          {act.isLogin ? (
+                            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="activity-info">
+                          <strong>{act.title}</strong>
+                          <small>{act.description}</small>
+                        </div>
+                      </div>
+                      <span className="activity-time">{act.time}</span>
+                    </div>
+                  ))}
+                </div>
               </article>
             </section>
             <section className="reference-directory">

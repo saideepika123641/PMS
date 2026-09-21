@@ -20,16 +20,16 @@ function readStoredValue(key) {
   }
 }
 
-function AdminLayout({ activeLabel, title, subtitle, children }) {
+function AdminLayout({ activeLabel, title, subtitle, headerAction, children }) {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState('')
   const [showResults, setShowResults] = useState(false)
   const user = readStoredValue('pharmacyAdminUser') || {}
   const assignment = readStoredValue('pharmacyAdminAssignment') || {}
-  const adminName = user?.name || user?.fullName || user?.email || 'Pilla Durga Prasad'
-  const hospitalName = assignment?.hospitalName || assignment?.hospital?.name || assignment?.clinicName || assignment?.clinic?.name || 'Hospital'
-  const branchName = assignment?.branchName || assignment?.branch?.name || assignment?.pharmacyName || assignment?.pharmacy?.name || 'Branch'
+  const adminName = user?.name || user?.fullName || user?.email || 'Admin'
+  const hospitalName = assignment?.hospitalName || assignment?.hospital?.name || assignment?.clinicName || assignment?.clinic?.name || 'PMS'
+  const branchName = assignment?.branchName || assignment?.branch?.name || assignment?.pharmacyName || assignment?.pharmacy?.name || 'Admin Console'
   
   const results = useMemo(() => {
     const value = query.trim().toLowerCase()
@@ -48,13 +48,22 @@ function AdminLayout({ activeLabel, title, subtitle, children }) {
     if (results[0]) goTo(results[0].path)
   }
 
+  function handleMenuToggle() {
+    if (window.innerWidth <= 1024) {
+      setOpen(!open)
+    } else {
+      const shell = document.querySelector('.branch-admin-page')
+      if (shell) shell.classList.toggle('sidebar-collapsed')
+    }
+  }
+
   return (
     <div className={`branch-admin-page${open ? ' branch-admin-sidebar-open' : ''}`}>
       <AdminSidebar activeLabel={activeLabel} hospitalName={hospitalName} branchName={branchName} adminName={adminName} />
 
       <main className="branch-admin-main">
         <header className="branch-admin-header">
-          <button className="branch-admin-menu" type="button" onClick={() => setOpen(!open)}>
+          <button className="branch-admin-menu" type="button" onClick={handleMenuToggle} aria-label="Toggle sidebar">
             <Icon><path d="M4 6h16M4 12h16M4 18h16" /></Icon>
           </button>
           
@@ -73,7 +82,6 @@ function AdminLayout({ activeLabel, title, subtitle, children }) {
               onFocus={() => setShowResults(true)}
               placeholder="Search dashboard, medicines, users, reports..."
             />
-            <span className="search-shortcut-badge">⌘ K</span>
             {showResults ? (
               <div className="branch-admin-search-results">
                 {results.length ? results.slice(0, 7).map((item) => (
@@ -86,13 +94,24 @@ function AdminLayout({ activeLabel, title, subtitle, children }) {
           </form>
 
           <div className="header-right-actions">
-            <button className="branch-admin-notification" type="button" aria-label="Notifications" title="Notifications">
-              <Icon><path d="M6 9a6 6 0 0 1 12 0c0 7 2 7 2 9H4c0-2 2-2-2-9" /><path d="M10 21h4" /></Icon>
+            <button className="branch-admin-notification" type="button" aria-label="Notifications" title="Notifications" onClick={() => navigate('/admin/expiry-alerts')}>
+              <Icon><path d="M6 9a6 6 0 0 1 12 0c0 7 2 7 2 9H4c0-2 2-2 2-9" /><path d="M10 21h4" /></Icon>
               <b className="unread-dot" />
             </button>
             <UserProfileMenu roleType="pharmacy-admin" />
           </div>
         </header>
+
+        {title && activeLabel !== 'Dashboard' ? (
+          <section className="reference-heading-card admin-heading-card">
+            <div className="reference-heading-accent" />
+            <div className="admin-heading-text-wrap">
+              <h1>{title}</h1>
+              {subtitle ? <p>{subtitle}</p> : null}
+            </div>
+            {headerAction ? <div className="admin-heading-action">{headerAction}</div> : null}
+          </section>
+        ) : null}
 
         <div className={`branch-admin-content${activeLabel === 'Dashboard' ? ' is-dashboard' : ''}`}>
           {children}

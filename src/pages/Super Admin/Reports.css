@@ -45,7 +45,7 @@
 
 /* Reference-style dashboard refinement */
 .reports-page {
-  background: linear-gradient(180deg, #f6f9fd 0%, #f3f7fb 100%);
+  background: transparent;
 }
 
 .reports-heading {

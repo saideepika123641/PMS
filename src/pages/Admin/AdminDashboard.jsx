@@ -137,8 +137,10 @@ function AdminDashboard() {
   return (
     <AdminLayout activeLabel="Dashboard" title="Admin Dashboard" subtitle="Admin / Dashboard">
       {/* Dashboard Page Header */}
-      <section className="branch-dashboard-header-redesign">
-        <div>
+      {/* Dashboard Page Header */}
+      <section className="branch-dashboard-header-redesign reference-heading-card">
+        <div className="reference-heading-accent" />
+        <div className="admin-heading-text-wrap">
           <div className="header-title-badge-row">
             <h1>Admin Dashboard</h1>
             <span className="live-status-pill">
@@ -155,28 +157,19 @@ function AdminDashboard() {
         {view.stats.map((card) => (
           <div
             key={card.id}
-            className="stat-card-redesign"
-            style={{
-              '--card-accent': card.color,
-              '--card-bg': card.bgColor,
-              '--card-border': card.borderColor
-            }}
+            className={`stat-card-redesign stat-card-${card.id}`}
             onClick={() => navigate(card.route)}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && navigate(card.route)}
             aria-label={`Navigate to ${card.label}`}
           >
-            <div className="stat-card-top">
-              <div className="stat-card-icon-wrap">
-                {card.icon}
-              </div>
-              <span className="stat-card-badge">{card.badgeText}</span>
+            <div className="stat-card-icon-wrap" style={{ background: card.bgColor, color: card.color }}>
+              {card.icon}
             </div>
             <div className="stat-card-body">
-              <label>{card.label}</label>
               <strong className="stat-card-val">{loading ? '...' : card.val}</strong>
-              <small className="stat-card-sub">{card.subText}</small>
+              <label>{card.label}</label>
             </div>
           </div>
         ))}

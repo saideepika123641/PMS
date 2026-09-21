@@ -1,199 +1,217 @@
-/* Design System CSS Variables / Tokens */
+/* ==========================================================================
+   PMS Admin Module Design System
+   Matches the CMS Admin Console reference design & styling tokens
+   ========================================================================== */
+
+/* Core Color Tokens */
 :root {
-  --primary: #0878e8;
-  --primary-light: #eaf4ff;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #eff6ff;
 
   --success: #10b981;
-  --success-light: #eafbf4;
+  --success-light: #ecfdf5;
 
   --warning: #f59e0b;
-  --warning-light: #fff7e6;
+  --warning-light: #fef3c7;
 
   --danger: #ef4444;
-  --danger-light: #fff0f0;
+  --danger-light: #fee2e2;
 
   --purple: #8b5cf6;
-  --purple-light: #f3eeff;
+  --purple-light: #f3e8ff;
 
-  --cyan: #06b6d4;
-  --cyan-light: #ecfcff;
-
-  --pink: #ec4899;
-  --pink-light: #fff0f7;
+  --cyan: #0284c7;
+  --cyan-light: #e0f2fe;
 
   --text-primary: #0f172a;
   --text-secondary: #64748b;
+  --border-light: #edf2f7;
   --border: #e2e8f0;
-  --background: #f6f9fc;
 }
 
 .admin-icon {
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
   stroke: currentColor;
-  stroke-width: 1.9;
+  stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* Dashboard Page Header */
+/* --------------------------------------------------------------------------
+   Heading Card (White enclosed card with blue vertical accent bar)
+   -------------------------------------------------------------------------- */
+.reference-heading-card,
+.admin-heading-card,
 .branch-dashboard-header-redesign {
-  margin: 28px 0 20px;
+  margin: 14px 0 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+  box-sizing: border-box;
+}
+
+.reference-heading-accent,
+.admin-heading-accent {
+  width: 4px;
+  height: 32px;
+  border-radius: 999px;
+  background: #0284c7;
+  flex: 0 0 4px;
+}
+
+.admin-heading-text-wrap {
+  flex: 1 1 auto;
 }
 
 .header-title-badge-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
-.header-title-badge-row h1 {
+.header-title-badge-row h1,
+.reference-heading-card h1,
+.admin-heading-card h1,
+.branch-dashboard-header-redesign h1 {
   margin: 0;
   color: #0f172a;
-  font-size: 28px;
+  font-size: 18px;
   font-weight: 800;
-  line-height: 1.15;
   letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.admin-heading-text-wrap p,
+.reference-heading-card p,
+.admin-heading-card p,
+.branch-dashboard-header-redesign p {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .live-status-pill {
   background: #ecfdf5;
   color: #059669;
   border: 1px solid #a7f3d0;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 11px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-.pulse-dot-green {
-  width: 7px;
-  height: 7px;
+.live-pulse-dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #10b981;
-  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
-  animation: pulseDot 2s infinite;
+  animation: pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.branch-dashboard-header-redesign p {
-  margin: 6px 0 0;
-  color: #64748b;
-  font-size: 14px;
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
 }
 
-/* Top 4 Equal-Sized Stat Cards Grid */
+/* --------------------------------------------------------------------------
+   Top 4 Stat Cards Redesign (CMS reference match)
+   -------------------------------------------------------------------------- */
 .branch-summary-4grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-  align-items: stretch;
-  margin-top: 18px;
+  gap: 12px;
+  margin-bottom: 14px;
   width: 100%;
 }
 
 .stat-card-redesign {
   background: #ffffff;
-  border: 1px solid var(--card-border, #e2e8f0);
-  border-radius: 14px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 16px;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  height: 100%;
-  min-height: 110px;
-}
-
-.stat-card-redesign:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.08);
-  border-color: var(--card-accent);
-}
-
-.stat-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.stat-card-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--card-bg, #eff6ff);
-  color: var(--card-accent, #2563eb);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
+  gap: 12px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
 }
 
-.stat-card-redesign:hover .stat-card-icon-wrap {
-  transform: scale(1.06);
+.stat-card-redesign:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+
+.stat-card-sales { border-bottom: 3px solid #3b82f6; }
+.stat-card-prescriptions { border-bottom: 3px solid #8b5cf6; }
+.stat-card-lowStock { border-bottom: 3px solid #f59e0b; }
+.stat-card-expiryAlerts { border-bottom: 3px solid #ef4444; }
+
+.stat-card-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
 }
 
 .stat-card-icon-wrap svg {
-  width: 22px;
-  height: 22px;
-}
-
-.stat-card-badge {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--card-accent, #2563eb);
-  background: var(--card-bg, #eff6ff);
-  padding: 3px 9px;
-  border-radius: 12px;
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .stat-card-body {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-}
-
-.stat-card-body label {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
+  text-align: left;
 }
 
 .stat-card-val {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
-.stat-card-sub {
-  font-size: 11.5px;
-  color: #059669;
-  font-weight: 600;
-  margin-top: 4px;
+.stat-card-body label {
+  margin-top: 2px;
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+  cursor: pointer;
 }
 
-/* Main Grid Layout */
+/* --------------------------------------------------------------------------
+   Panels & Analytics Sections (matching CMS top accent borders)
+   -------------------------------------------------------------------------- */
 .branch-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
-  gap: 16px;
-  margin-top: 16px;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
 .branch-grid.three {
@@ -203,18 +221,20 @@
 .branch-panel {
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-  transition: all 0.2s ease;
-  min-width: 0;
-  margin-top: 0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
-.branch-panel:hover {
-  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.04);
+.branch-chart-panel {
+  border-top: 3px solid #14b8a6; /* Teal accent like Charts in reference */
+}
+
+.branch-panel:nth-child(2) {
+  border-top: 3px solid #3b82f6; /* Blue accent like Activities in reference */
 }
 
 .branch-panel-heading {
@@ -222,19 +242,26 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
-  padding-bottom: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #f1f5f9;
 }
 
 .branch-panel-heading h2 {
   margin: 0;
   color: #0f172a;
-  font-size: 15px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
-/* Sales Overview Filter Pills */
+.branch-panel-heading p {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 11px;
+}
+
+/* Filter Pills */
 .chart-filter-pills {
   display: flex;
   gap: 4px;
@@ -246,22 +273,22 @@
 .chart-filter-pills button {
   background: transparent;
   border: none;
-  padding: 4px 10px;
-  font-size: 11.5px;
+  padding: 4px 11px;
+  font-size: 12px;
   font-weight: 600;
   color: #64748b;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.16s ease;
 }
 
 .chart-filter-pills button.active {
   background: #ffffff;
   color: #2563eb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
 }
 
-/* Analytics Card Body & Empty State */
+/* Analytics Empty State */
 .analytics-card-body {
   flex: 1;
   display: flex;
@@ -283,9 +310,9 @@
 .analytics-empty-icon {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  background: #eff6ff;
-  color: #2563eb;
+  border-radius: 12px;
+  background: #ecfdf5;
+  color: #10b981;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -311,25 +338,6 @@
   max-width: 280px;
 }
 
-.btn-create-sale {
-  height: 38px;
-  padding: 0 16px;
-  border-radius: 8px;
-  background: #2563eb;
-  border: 1px solid #2563eb;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
-  transition: all 0.2s ease;
-}
-
-.btn-create-sale:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-}
-
 /* Top Medicines Ranking List */
 .top-meds-card-body {
   flex: 1;
@@ -347,14 +355,15 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: #f8fafc;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #ffffff;
   border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02);
 }
 
 .med-rank {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   color: #2563eb;
   background: #eff6ff;
@@ -363,6 +372,7 @@
   border-radius: 8px;
   display: grid;
   place-items: center;
+  flex: 0 0 32px;
 }
 
 .med-details {
@@ -374,7 +384,7 @@
   display: block;
   font-size: 13px;
   color: #0f172a;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .med-details small {
@@ -384,94 +394,257 @@
 }
 
 .med-qty-badge {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: #059669;
   background: #ecfdf5;
-  padding: 4px 10px;
+  padding: 3px 9px;
   border-radius: 6px;
 }
 
-/* Lower Dashboard Table Styling */
-.btn-table-action {
-  height: 32px;
-  padding: 0 12px;
-  border-radius: 6px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  color: #2563eb;
+/* --------------------------------------------------------------------------
+   Buttons System (Standardized across all Admin screens)
+   -------------------------------------------------------------------------- */
+
+/* Primary Buttons */
+.btn-primary,
+.med-btn-primary,
+.btn-create-sale,
+.branch-panel-heading button,
+.pharmacist-panel .branch-panel-heading button,
+.sa-btn-primary,
+.admin-btn-primary,
+button.btn-primary {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #2563eb !important;
+  border-radius: 9px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  padding: 8px 16px !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2) !important;
+  transition: all 0.16s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  text-decoration: none !important;
+}
+
+.btn-primary:hover,
+.med-btn-primary:hover,
+.btn-create-sale:hover,
+.branch-panel-heading button:hover,
+.pharmacist-panel .branch-panel-heading button:hover,
+.sa-btn-primary:hover,
+.admin-btn-primary:hover,
+button.btn-primary:hover {
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28) !important;
+}
+
+/* Secondary / Ghost / View All Buttons */
+.btn-secondary,
+.med-btn-secondary,
+.btn-table-action,
+.sa-btn-secondary,
+.btn-view-all,
+button.btn-secondary {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 6px 14px !important;
+  cursor: pointer !important;
+  transition: all 0.16s ease !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.02) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  text-decoration: none !important;
+}
+
+.btn-secondary:hover,
+.med-btn-secondary:hover,
+.btn-table-action:hover,
+.sa-btn-secondary:hover,
+.btn-view-all:hover,
+button.btn-secondary:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* Search & Toolbar Buttons */
+.pharmacist-search,
+.admin-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 6px 12px;
+  margin-bottom: 16px;
+}
+
+.pharmacist-search input,
+.admin-search-bar input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.pharmacist-search button,
+.admin-search-bar button {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #334155;
   font-size: 12px;
   font-weight: 600;
+  padding: 6px 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.16s ease;
 }
 
-.btn-table-action:hover {
+.pharmacist-search button:hover,
+.admin-search-bar button:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Table Icon Action Buttons */
+.action-btn,
+.super-admin-action-button,
+.table-action-btn,
+.branch-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.action-btn.view,
+.super-admin-action-button.view {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #dbeafe;
+}
+.action-btn.view:hover,
+.super-admin-action-button.view:hover {
   background: #2563eb;
   color: #ffffff;
+  border-color: #2563eb;
 }
 
+.action-btn.edit,
+.super-admin-action-button.edit {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+}
+.action-btn.edit:hover,
+.super-admin-action-button.edit:hover {
+  background: #059669;
+  color: #ffffff;
+  border-color: #059669;
+}
+
+.action-btn.danger,
+.super-admin-action-button.danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+.action-btn.danger:hover,
+.super-admin-action-button.danger:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
+/* --------------------------------------------------------------------------
+   Tables & Status Badges
+   -------------------------------------------------------------------------- */
 .branch-table-wrap {
   overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .branch-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  white-space: nowrap;
 }
 
 .branch-table th {
-  text-align: left;
-  padding: 10px 12px;
+  padding: 11px 14px;
   background: #f8fafc;
-  color: #64748b;
+  color: #475569;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   border-bottom: 1px solid #e2e8f0;
+  text-align: left;
 }
 
 .branch-table td {
-  padding: 10px 12px;
-  color: #334155;
+  padding: 12px 14px;
   border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  font-size: 13px;
 }
 
 .branch-table tr:hover td {
   background: #f8fafc;
 }
 
-/* Status Badges */
-.table-status-badge {
-  padding: 3px 9px;
+/* Status Pills */
+.table-status-badge,
+.branch-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
   border-radius: 6px;
   font-size: 11px;
-  font-weight: 700;
-  display: inline-block;
+  font-weight: 600;
 }
 
-.status-success {
-  background: #ecfdf5;
-  color: #059669;
-  border: 1px solid #a7f3d0;
+.status-success,
+.branch-status.active {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
 }
 
-.status-warning {
-  background: #fff7e6;
-  color: #d97706;
-  border: 1px solid #fde68a;
-}
-
-.status-amber {
+.status-warning,
+.branch-status.near-expiry {
   background: #ffedd5;
-  color: #ea580c;
+  color: #c2410c;
   border: 1px solid #fed7aa;
 }
 
-.status-danger {
-  background: #fff0f0;
+.status-danger,
+.branch-status.expired {
+  background: #fee2e2;
   color: #dc2626;
   border: 1px solid #fecaca;
 }
@@ -482,22 +655,63 @@
   border: 1px solid #e2e8f0;
 }
 
+.table-status-badge.clickable {
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  font-family: inherit;
+}
+.table-status-badge.clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  filter: brightness(0.96);
+}
+.table-status-badge.clickable:active {
+  transform: translateY(0);
+}
+
+.action-btn.status-toggle {
+  transition: all 0.2s ease;
+}
+.action-btn.status-toggle.is-active {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+}
+.action-btn.status-toggle.is-active:hover {
+  background: #059669;
+  color: #ffffff;
+  border-color: #059669;
+}
+.action-btn.status-toggle.is-inactive {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+.action-btn.status-toggle.is-inactive:hover {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+}
+
 .table-empty-box {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 24px;
+  padding: 28px;
   color: #94a3b8;
   font-size: 12.5px;
 }
 
 .empty-box-icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
 }
 
-/* Responsive Grid Adjustments */
+/* --------------------------------------------------------------------------
+   Responsive Adaptations
+   -------------------------------------------------------------------------- */
 @media (max-width: 1200px) {
   .branch-summary-4grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -514,12 +728,149 @@
 }
 
 @media (max-width: 640px) {
+  .branch-admin-main {
+    padding: 0 16px 28px !important;
+  }
+  .branch-admin-header {
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
   .branch-summary-4grid {
     grid-template-columns: 1fr;
   }
-  .branch-dashboard-header-redesign {
+  .branch-dashboard-header-redesign,
+  .admin-heading-card {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Pharmacist Separate Screen & Form Styling
+   -------------------------------------------------------------------------- */
+.pharmacist-create-panel {
+  margin-top: 10px;
+}
+
+.pharmacist-screen-form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pharmacist-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+}
+
+.pharmacist-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.pharmacist-form-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.pharmacist-form-field input,
+.pharmacist-form-field select,
+.pharmacist-form-field textarea {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 13.5px;
+  outline: none;
+  transition: all 0.16s ease;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.pharmacist-form-field input:focus,
+.pharmacist-form-field select:focus,
+.pharmacist-form-field textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.pharmacist-form-field input.has-error {
+  border-color: #ef4444;
+  background: #fffafa;
+}
+
+.pharmacist-form-field .form-error-msg {
+  color: #ef4444;
+  font-size: 11.5px;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.pharmacist-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  margin-top: 8px;
+}
+
+.password-input-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrap input {
+  padding-right: 42px !important;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #0f172a;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 680px) {
+  .pharmacist-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Override browser default autofill yellow/blue background */
+.pharmacist-form-field input:-webkit-autofill,
+.pharmacist-form-field input:-webkit-autofill:hover,
+.pharmacist-form-field input:-webkit-autofill:focus,
+.pharmacist-form-field input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+

@@ -3,7 +3,7 @@ import SuperAdminSidebar from './SuperAdminSidebar'
 import SuperAdminTopbar from './SuperAdminTopbar'
 import './SuperAdminModulePage.css'
 
-function SuperAdminModulePage({ title, headers = [], rows = [], loading = false, error = '' }) {
+function SuperAdminModulePage({ title, headers = [], rows = [], loading = false, error = '', action = null, children = null }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [query, setQuery] = useState('')
   const tableHeaders = headers.length ? headers : ['Name', 'Details', 'Status']
@@ -33,10 +33,13 @@ function SuperAdminModulePage({ title, headers = [], rows = [], loading = false,
                 <h2>{title}</h2>
                 <p>{loading ? 'Loading data...' : error || ''}</p>
               </div>
-              <label className="super-admin-module-filter">
-                <span aria-hidden="true">Search</span>
-                <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Filter ${title.toLowerCase()}...`} />
-              </label>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <label className="super-admin-module-filter">
+                  <span aria-hidden="true">Search</span>
+                  <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Filter ${title.toLowerCase()}...`} />
+                </label>
+                {action}
+              </div>
             </div>
 
             <div className="super-admin-module-table">
@@ -62,6 +65,7 @@ function SuperAdminModulePage({ title, headers = [], rows = [], loading = false,
           </section>
         </div>
       </main>
+      {children}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useToast } from '../../components/ToastProvider'
-import { getExpiredInventory, getNearExpiryInventory, getNearExpiryInventoryDetails } from '../../config/api'
+import { disposeInventoryBatch, getExpiredInventory, getNearExpiryInventory, getNearExpiryInventoryDetails } from '../../config/api'
 import AdminLayout from './AdminLayout'
 
 function normalizeList(response) {
@@ -18,12 +19,33 @@ function getId(item, index) {
 }
 
 export default function ExpiryAlerts() {
+  const navigate = useNavigate()
   const { showToast } = useToast()
   const [mode, setMode] = useState('near')
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(false)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [viewingItem, setViewingItem] = useState(null)
+
+  async function handleDispose(item) {
+    const batchNo = item?.batchNo || item?.batchNumber
+    if (!window.confirm(`Are you sure you want to dispose expired batch: ${batchNo || 'selected batch'}?`)) return
+    try {
+      if (batchNo) {
+        await disposeInventoryBatch(batchNo, { reason: 'Expired medicine alert disposal' })
+      }
+      setItems((current) => current.filter((it) => (it?.batchNo || it?.batchNumber) !== batchNo))
+      showToast(`Batch ${batchNo || ''} disposed successfully.`, 'success')
+    } catch (err) {
+      showToast(err.message || 'Error disposing batch.', 'error')
+    }
+  }
+
+  function handleEdit(item) {
+    showToast(`Redirecting to Stock to adjust batch ${item?.batchNo || ''}...`, 'info')
+    navigate('/admin/stock')
+  }
 
   async function load(nextMode = mode) {
     setMode(nextMode)
@@ -230,7 +252,7 @@ export default function ExpiryAlerts() {
                           className="admin-action-button view" 
                           aria-label="View details" 
                           title="View details"
-                          onClick={() => showToast(`Batch details: Qty ${item?.quantity || 0}, Expiry ${item?.expiryDate}`, 'info')}
+                          onClick={() => setViewingItem(item)}
                         >
                           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
                         </button>
@@ -239,7 +261,7 @@ export default function ExpiryAlerts() {
                           className="admin-action-button edit" 
                           aria-label="Edit stock" 
                           title="Edit stock"
-                          onClick={() => showToast(`Opening edit details for medicine ${item?.medicineName || 'stock'}`, 'info')}
+                          onClick={() => handleEdit(item)}
                         >
                           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
                         </button>
@@ -248,7 +270,7 @@ export default function ExpiryAlerts() {
                           className="admin-action-button danger" 
                           aria-label="Dispose batch" 
                           title="Dispose batch"
-                          onClick={() => showToast(`Initiating disposal flow for batch ${item?.batchNo || 'item'}`, 'info')}
+                          onClick={() => handleDispose(item)}
                         >
                           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /></svg>
                         </button>
@@ -265,6 +287,49 @@ export default function ExpiryAlerts() {
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {viewingItem && (
+          <div className="stock-modal-overlay" onClick={() => setViewingItem(null)}>
+            <div className="stock-modal-container" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
+              <div className="stock-modal-header">
+                <h2>Batch Expiry Details</h2>
+                <button type="button" className="stock-modal-close" onClick={() => setViewingItem(null)}>&times;</button>
+              </div>
+              <div className="stock-modal-body" style={{ padding: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Medicine Name</label>
+                    <p style={{ margin: '4px 0 0', fontWeight: 700, color: '#0f172a', fontSize: '14px' }}>{viewingItem.medicineName || viewingItem.name || '-'}</p>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Batch Number</label>
+                    <p style={{ margin: '4px 0 0', fontWeight: 700, color: '#0f172a', fontSize: '14px' }}><code>{viewingItem.batchNo || viewingItem.batchNumber || '-'}</code></p>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Quantity Remaining</label>
+                    <p style={{ margin: '4px 0 0', fontWeight: 700, color: '#0f172a', fontSize: '14px' }}>{viewingItem.quantity || viewingItem.stock || 0} units</p>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Expiry Date</label>
+                    <p style={{ margin: '4px 0 0', fontWeight: 700, color: '#ef4444', fontSize: '14px' }}>{viewingItem.expiryDate || viewingItem.expiresAt || '-'}</p>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Days Remaining</label>
+                    <p style={{ margin: '4px 0 0', fontWeight: 700, color: '#f59e0b', fontSize: '14px' }}>{viewingItem.daysLeft ?? '-'} days</p>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase' }}>Status</label>
+                    <p style={{ margin: '4px 0 0', fontWeight: 700, fontSize: '14px' }}>{getStatusLabel(viewingItem)}</p>
+                  </div>
+                </div>
+              </div>
+              <div className="stock-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', padding: '14px 20px', borderTop: '1px solid #e2e8f0' }}>
+                <button type="button" className="stock-btn stock-btn-secondary" onClick={() => setViewingItem(null)}>Close</button>
+                <button type="button" className="stock-btn stock-btn-primary" onClick={() => { const it = viewingItem; setViewingItem(null); handleEdit(it) }}>Adjust in Stock &rarr;</button>
+              </div>
+            </div>
           </div>
         )}
       </section>

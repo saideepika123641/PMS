@@ -73,11 +73,17 @@ function Admins() {
   const [hospitals, setHospitals] = useState([])
   const [branches, setBranches] = useState([])
   const [query, setQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
+  const [filterDropdownOpen, setFilterDropdownOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const pageSize = 5
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [createOpen, setCreateOpen] = useState(false)
   const [form, setForm] = useState(emptyForm)
+  const [sendWelcomeEmail, setSendWelcomeEmail] = useState(true)
   const [editingAdmin, setEditingAdmin] = useState(null)
+  const [viewingAdmin, setViewingAdmin] = useState(null)
   const [assigningAdmin, setAssigningAdmin] = useState(null)
   const [resettingAdmin, setResettingAdmin] = useState(null)
   const [temporaryPassword, setTemporaryPassword] = useState('')
@@ -86,9 +92,19 @@ function Admins() {
 
   const filteredAdmins = useMemo(() => {
     const value = query.trim().toLowerCase()
-    if (!value) return admins
-    return admins.filter((admin) => JSON.stringify(admin).toLowerCase().includes(value))
-  }, [admins, query])
+    return admins.filter((admin) => {
+      const matchesQuery = !value || JSON.stringify(admin).toLowerCase().includes(value)
+      const matchesStatus = statusFilter === 'All' || String(getStatus(admin)).toLowerCase() === statusFilter.toLowerCase()
+      return matchesQuery && matchesStatus
+    })
+  }, [admins, query, statusFilter])
+
+  useEffect(() => {
+    setPage(1)
+  }, [query, statusFilter])
+
+  const pageCount = Math.max(1, Math.ceil(filteredAdmins.length / pageSize))
+  const visibleAdmins = filteredAdmins.slice((page - 1) * pageSize, page * pageSize)
 
   async function loadAdmins() {
     setLoading(true)
@@ -166,6 +182,7 @@ function Admins() {
       email: form.email,
       phone: form.phone,
       ...(form.password ? { password: form.password } : {}),
+      sendWelcomeEmail,
     }
 
     try {
@@ -285,10 +302,61 @@ function Admins() {
               <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search admins by name, email, clinic, or role..." />
             </label>
 
-            <button type="button" className="admins-filter-button">
-              All
-              <span>▾</span>
-            </button>
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                className="admins-filter-button"
+                onClick={() => setFilterDropdownOpen((prev) => !prev)}
+                aria-label="Filter admins by status"
+              >
+                Status: {statusFilter}
+                <span>▾</span>
+              </button>
+              {filterDropdownOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: 0,
+                    marginTop: '6px',
+                    background: '#fff',
+                    border: '1px solid rgba(148, 163, 184, 0.2)',
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                    zIndex: 50,
+                    minWidth: '130px',
+                    padding: '6px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px',
+                  }}
+                >
+                  {['All', 'Active', 'Inactive'].map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => {
+                        setStatusFilter(option)
+                        setFilterDropdownOpen(false)
+                      }}
+                      style={{
+                        border: 0,
+                        background: statusFilter === option ? '#eff6ff' : 'transparent',
+                        color: statusFilter === option ? '#2563eb' : '#334155',
+                        fontWeight: statusFilter === option ? 700 : 500,
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                      }}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {(createOpen || editingAdmin) ? (
@@ -340,7 +408,12 @@ function Admins() {
                     <strong>Send welcome email</strong>
                     <small>With login instructions</small>
                   </div>
-                  <button type="button" className="admins-toggle is-on" aria-label="Toggle welcome email">
+                  <button
+                    type="button"
+                    className={`admins-toggle ${sendWelcomeEmail ? 'is-on' : ''}`}
+                    aria-label="Toggle welcome email"
+                    onClick={() => setSendWelcomeEmail((prev) => !prev)}
+                  >
                     <span className="admins-toggle-knob" />
                   </button>
                 </div>
@@ -371,9 +444,9 @@ function Admins() {
               <tbody>
                 {loading ? (
                   <tr><td colSpan="7" className="admins-empty-cell">Loading admins...</td></tr>
-                ) : filteredAdmins.length ? filteredAdmins.map((admin, index) => (
+                ) : visibleAdmins.length ? visibleAdmins.map((admin, index) => (
                   <tr key={getId(admin)}>
-                    <td>{index + 1}</td>
+                    <td>{(page - 1) * pageSize + index + 1}</td>
                     <td className="admin-name-cell">
                       <span className="admin-avatar">{getName(admin).split(' ').slice(0,2).map((part) => part.charAt(0)).join('').slice(0,2).toUpperCase() || 'A'}</span>
                       {getName(admin)}
@@ -391,7 +464,7 @@ function Admins() {
                     <td><span className={`admin-status ${String(getStatus(admin)).toLowerCase()}`}>{getStatus(admin)}</span></td>
                     <td>
                       <div className="admin-action-group">
-                        <button type="button" className="admin-action-button view" aria-label="View admin" title="View admin" onClick={() => openEdit(admin)}>
+                        <button type="button" className="admin-action-button view" aria-label="View admin" title="View admin" onClick={() => setViewingAdmin(admin)}>
                           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
                         </button>
                         <button type="button" className="admin-action-button edit" aria-label="Edit admin" title="Edit admin" onClick={() => openEdit(admin)}>
@@ -414,17 +487,81 @@ function Admins() {
           </div>
 
           <div className="admins-pagination-row">
-            <span>Showing {filteredAdmins.length} of {admins.length} admins</span>
+            <span>Showing {visibleAdmins.length} of {filteredAdmins.length} admins</span>
             <div className="admins-pagination">
-              <button type="button">First</button>
-              <button type="button">Prev</button>
-              <button type="button" className="is-current">1</button>
-              <button type="button">Next</button>
-              <button type="button">Last</button>
+              <button type="button" onClick={() => setPage(1)} disabled={page === 1}>First</button>
+              <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>Prev</button>
+              {Array.from({ length: pageCount }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === pageCount || Math.abs(p - page) <= 1)
+                .map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    type="button"
+                    className={pageNum === page ? 'is-current' : ''}
+                    onClick={() => setPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+              <button type="button" onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page === pageCount}>Next</button>
+              <button type="button" onClick={() => setPage(pageCount)} disabled={page === pageCount}>Last</button>
             </div>
           </div>
         </section>
       </main>
+
+      {viewingAdmin && (
+        <div className="sa-modal-backdrop" onClick={() => setViewingAdmin(null)}>
+          <div className="sa-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="sa-modal-header">
+              <h2>Admin Details: {getName(viewingAdmin)}</h2>
+              <button type="button" className="sa-modal-close" onClick={() => setViewingAdmin(null)}>&times;</button>
+            </div>
+            <div className="sa-modal-body">
+              <div className="sa-modal-grid">
+                <div className="sa-modal-field">
+                  <label>Full Name</label>
+                  <span>{getName(viewingAdmin)}</span>
+                </div>
+                <div className="sa-modal-field">
+                  <label>Email Address</label>
+                  <span>{viewingAdmin?.email || '-'}</span>
+                </div>
+                <div className="sa-modal-field">
+                  <label>Mobile Number</label>
+                  <span>{viewingAdmin?.phone || viewingAdmin?.mobile || '-'}</span>
+                </div>
+                <div className="sa-modal-field">
+                  <label>Status</label>
+                  <span>{getStatus(viewingAdmin)}</span>
+                </div>
+                <div className="sa-modal-field">
+                  <label>Assigned Clinic</label>
+                  <span>{viewingAdmin?.hospital?.name || viewingAdmin?.hospitalName || '-'}</span>
+                </div>
+                <div className="sa-modal-field">
+                  <label>Assigned Branch</label>
+                  <span>{viewingAdmin?.branch?.name || viewingAdmin?.branchName || '-'}</span>
+                </div>
+              </div>
+            </div>
+            <div className="sa-modal-footer">
+              <button type="button" className="sa-btn-secondary" onClick={() => setViewingAdmin(null)}>Close</button>
+              <button
+                type="button"
+                className="sa-btn-primary"
+                onClick={() => {
+                  const a = viewingAdmin
+                  setViewingAdmin(null)
+                  openEdit(a)
+                }}
+              >
+                Edit Admin
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {assigningAdmin ? (
         <div className="admins-modal-backdrop" onClick={() => setAssigningAdmin(null)}>
