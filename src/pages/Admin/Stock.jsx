@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useToast } from '../../components/ToastProvider'
+import RowActions from '../../components/RowActions'
 import AdminLayout from './AdminLayout'
 import { 
   addInventoryStock,
@@ -804,54 +805,7 @@ export default function Stock({ initialView }) {
                         <td>{getSellingPrice(item)}</td>
                         <td>{getStatusBadge(item)}</td>
                         <td>
-                          <div className="admin-action-group">
-                            <button 
-                              type="button" 
-                              className="admin-action-button view" 
-                              aria-label="View Details" 
-                              title="View Details"
-                              onClick={() => setViewingItem(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button edit" 
-                              aria-label="Edit Stock Levels" 
-                              title="Edit Stock Levels"
-                              onClick={() => prefillLevels(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button assign" 
-                              aria-label="Prefill Adjustment" 
-                              title="Prefill Adjustment"
-                              onClick={() => prefillAdjustment(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button danger" 
-                              aria-label="Dispose Batch" 
-                              title="Dispose Batch"
-                              onClick={() => handleDispose(item?.batchNo || item?.batchNumber)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button view" 
-                              style={{ color: '#ca8a04', borderColor: '#fef08a', background: '#fef9c3' }}
-                              aria-label="Quarantine Batch" 
-                              title="Quarantine Batch"
-                              onClick={() => handleQuarantine(item?.batchNo || item?.batchNumber)}
-                            >
-                              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            </button>
-                          </div>
+                          <RowActions itemName={getMedicineName(item)} onView={() => setViewingItem(item)} onEdit={() => prefillLevels(item)} statusDisabled={true} onDelete={() => handleDispose(item?.batchNo || item?.batchNumber)} />
                         </td>
                       </tr>
                     )) : (
@@ -1172,3 +1126,6 @@ export default function Stock({ initialView }) {
     </AdminLayout>
   )
 }
+
+
+

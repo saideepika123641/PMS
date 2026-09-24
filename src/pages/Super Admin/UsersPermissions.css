@@ -353,3 +353,199 @@
 		left: 0 !important;
 	}
 }
+.permissions-success { margin: 0 0 10px; padding: 9px 12px; border: 1px solid #bbf7d0; border-radius: 8px; background: #f0fdf4; color: #15803d; font-size: 11px; font-weight: 700; }
+.permissions-role-table tr.is-selected { background: #f0fdfa !important; }
+.permission-status, .permission-pill { display: inline-flex; align-items: center; justify-content: center; min-height: 24px; padding: 4px 9px; border-radius: 999px; font-size: 0.62rem; font-weight: 800; }
+.permission-status.active { background: #dcfce7; color: #15803d; }
+.permission-status.inactive { background: #fee2e2; color: #b91c1c; }
+.permission-pill { background: #eef4ff; color: #386cf0; }
+
+/* Super admin admin-only role permissions summary */
+.permissions-summary-panel {
+	padding: 0;
+	overflow: hidden;
+}
+
+.permissions-admin-summary table {
+	min-width: 1080px;
+}
+
+.permissions-admin-summary thead th {
+	background: #f8fafc;
+	color: #1f3f88;
+	font-size: 0.76rem;
+	font-weight: 900;
+	letter-spacing: 0;
+	text-transform: uppercase;
+}
+
+.permissions-admin-summary tbody tr {
+	cursor: pointer;
+	transition: background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.permissions-admin-summary tbody tr:hover {
+	background: #f6fffb;
+}
+
+.permissions-admin-summary tbody tr.is-selected {
+	background: #f8fffd !important;
+	box-shadow: inset 4px 0 0 #0f9d9d;
+}
+
+.permissions-admin-summary td {
+	vertical-align: top;
+}
+
+.permissions-admin-summary td > strong {
+	display: block;
+	color: #111827;
+	font-size: 0.82rem;
+	font-weight: 900;
+	line-height: 1.3;
+}
+
+.permissions-admin-summary td > small,
+.permissions-admin-summary .role-name-cell small,
+.permissions-admin-summary .permission-user-cell small {
+	display: block;
+	margin-top: 5px;
+	color: #64748b;
+	font-size: 0.68rem;
+	font-weight: 700;
+}
+
+.permissions-admin-summary .role-name-cell {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.permissions-admin-summary .role-name-cell strong {
+	display: block;
+	color: #111827;
+	font-size: 0.86rem;
+	font-weight: 900;
+}
+
+.permissions-admin-summary .role-mark {
+	display: inline-grid;
+	place-items: center;
+	width: 46px;
+	height: 46px;
+	border-radius: 999px;
+	background: #defaf1;
+	color: #0f9d9d;
+}
+
+.permissions-admin-summary .role-mark .permissions-icon {
+	width: 24px;
+	height: 24px;
+	stroke-width: 2.2;
+}
+
+.permissions-admin-summary .role-badge {
+	display: inline-flex !important;
+	width: max-content;
+	margin-top: 6px !important;
+	padding: 5px 9px;
+	border-radius: 7px;
+	background: #cdf8e7;
+	color: #07966d !important;
+	font-size: 0.62rem !important;
+	font-weight: 900 !important;
+}
+
+.permission-user-cell strong {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	color: #111827;
+	font-size: 0.82rem;
+	font-weight: 900;
+}
+
+.permission-user-cell .permissions-icon {
+	width: 18px;
+	height: 18px;
+	stroke-width: 2.1;
+}
+
+.permissions-admin-summary .permission-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	max-width: 560px;
+}
+
+.permissions-admin-summary .permission-tags span {
+	display: inline-flex;
+	align-items: center;
+	min-height: 28px;
+	padding: 5px 11px;
+	border-radius: 8px;
+	background: #ecfff2;
+	color: #0ba345;
+	font-size: 0.66rem;
+	font-weight: 900;
+	line-height: 1.2;
+	white-space: nowrap;
+}
+
+.permissions-admin-summary .permission-tags .permission-none {
+	background: #f1f5f9;
+	color: #94a3b8;
+}
+
+.permissions-module-head {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.permissions-select-all {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 38px;
+	padding: 0 16px;
+	border: 0;
+	border-radius: 9px;
+	background: linear-gradient(135deg, #54d2b2, #3fbd91);
+	box-shadow: 0 8px 18px rgba(44, 181, 143, 0.24);
+	color: #fff;
+	font-size: 0.68rem;
+	font-weight: 900;
+	cursor: pointer;
+}
+
+.permissions-select-all:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.permissions-select-all .permissions-icon {
+	width: 16px;
+	height: 16px;
+	stroke-width: 2.4;
+}
+
+.permissions-column-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	color: #145c5b;
+	font-size: 0.68rem;
+	font-weight: 900;
+	cursor: pointer;
+}
+
+.permissions-column-toggle input {
+	width: 18px;
+	height: 18px;
+	accent-color: #35b889;
+}
+
+.permissions-column-toggle input:disabled {
+	cursor: not-allowed;
+}

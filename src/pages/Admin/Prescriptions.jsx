@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useToast } from '../../components/ToastProvider'
+import RowActions from '../../components/RowActions'
 import AdminLayout from './AdminLayout'
 import { 
   cancelDoctorPrescription, 
@@ -8,7 +9,8 @@ import {
   getDoctorPrescription, 
   updateDoctorPrescription,
   getPharmacyPrescriptions,
-  getPharmacyAdminDashboard} from '../../config/api'
+  getPharmacyAdminDashboard
+} from '../../config/api'
 import './Prescriptions.css'
 
 const normalizeList = (response) => {
@@ -134,7 +136,13 @@ export default function Prescriptions() {
     try {
       const body = {
         patientName: createForm.patientName,
+        patientPhone: '',
+        patientAge: '',
+        patientGender: '',
         doctorName: createForm.doctorName,
+        diagnosis: '',
+        advice: '',
+        notes: '',
         medicines: [{
           medicineName: createForm.medicineName,
           dosage: createForm.dosage,
@@ -172,6 +180,13 @@ export default function Prescriptions() {
     setLoading(true)
     try {
       const body = {
+        appointmentId: editItem?.appointmentId || editItem?.appointment?.id || '',
+        patientId: editItem?.patientId || editItem?.patient?.id || '',
+        diagnosis: editItem?.diagnosis || '',
+        advice: editItem?.advice || '',
+        notes: editItem?.notes || '',
+        instructions: editForm.instructions,
+        followUpDate: editItem?.followUpDate || null,
         patientName: editForm.patientName,
         doctorName: editForm.doctorName,
         medicines: [{
@@ -413,44 +428,7 @@ export default function Prescriptions() {
                         <td>{getItemsCount(item)}</td>
                         <td>{getStatusBadge(item)}</td>
                         <td>
-                          <div className="admin-action-group">
-                            <button 
-                              type="button" 
-                              className="admin-action-button view" 
-                              aria-label="View Details" 
-                              title="View Details"
-                              onClick={() => setViewingItem(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button edit" 
-                              aria-label="Update Details" 
-                              title="Update Details"
-                              onClick={() => openEdit(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button assign" 
-                              aria-label="Complete Prescription" 
-                              title="Complete Prescription"
-                              onClick={() => handleComplete(item?._id || item?.id)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button danger" 
-                              aria-label="Cancel Prescription" 
-                              title="Cancel Prescription"
-                              onClick={() => handleCancel(item?._id || item?.id)}
-                            >
-                              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                            </button>
-                          </div>
+                          <RowActions itemName={getRxId(item)} onView={() => setViewingItem(item)} onEdit={() => openEdit(item)} onStatus={() => handleComplete(item?._id || item?.id)} onDelete={() => handleCancel(item?._id || item?.id)} />
                         </td>
                       </tr>
                     )) : (
@@ -734,3 +712,7 @@ export default function Prescriptions() {
     </AdminLayout>
   )
 }
+
+
+
+

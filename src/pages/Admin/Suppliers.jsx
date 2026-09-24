@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useToast } from '../../components/ToastProvider'
+import RowActions from '../../components/RowActions'
 import AdminLayout from './AdminLayout'
 import { 
   changeSupplierStatus, 
@@ -9,7 +10,8 @@ import {
   getSupplierPurchaseHistory, 
   listSuppliers, 
   updateSupplier,
-  getPharmacyAdminDashboard
+  getPharmacyAdminDashboard,
+  getAddressByPincode
 } from '../../config/api'
 import './Suppliers.css'
 
@@ -56,8 +58,12 @@ export default function Suppliers() {
     phone: '',
     email: '',
     address: '',
+    pincode: '',
+    area: '',
+    district: '',
     city: '',
     state: '',
+    country: '',
     estNumber: '',
     status: 'Active',
     notes: ''
@@ -71,8 +77,12 @@ export default function Suppliers() {
     phone: '',
     email: '',
     address: '',
+    pincode: '',
+    area: '',
+    district: '',
     city: '',
     state: '',
+    country: '',
     estNumber: '',
     status: 'Active',
     notes: ''
@@ -235,6 +245,48 @@ export default function Suppliers() {
     })
   }, [items, search, statusFilter])
 
+  function firstAddressValue(source, keys) {
+    for (const key of keys) {
+      const value = source?.[key]
+      if (value !== undefined && value !== null && String(value).trim() !== '') return String(value).trim()
+    }
+    return ''
+  }
+
+  function normalizePincodeAddress(response) {
+    const source = response?.data?.address || response?.data || response?.address || response?.result || response || {}
+    const first = Array.isArray(source) ? source[0] || {} : source
+    return {
+      area: firstAddressValue(first, ['area', 'Area', 'name', 'Name', 'officeName', 'OfficeName']),
+      district: firstAddressValue(first, ['district', 'District']),
+      city: firstAddressValue(first, ['city', 'City', 'taluk', 'Taluk', 'area', 'Area']),
+      state: firstAddressValue(first, ['state', 'State', 'province', 'Province']),
+      country: firstAddressValue(first, ['country', 'Country']),
+    }
+  }
+
+  async function handleSupplierPincodeChange(formType, value) {
+    const setter = formType === 'edit' ? setEditForm : setCreateForm
+    setter((current) => ({ ...current, pincode: value }))
+    const pincode = String(value || '').replace(/\D/g, '')
+    if (pincode.length !== 6) return
+
+    try {
+      const response = await getAddressByPincode(pincode)
+      const address = normalizePincodeAddress(response)
+      setter((current) => ({
+        ...current,
+        pincode: value,
+        area: address.area || current.area,
+        district: address.district || current.district,
+        city: address.city || address.district || current.city,
+        state: address.state || current.state,
+        country: address.country || current.country,
+      }))
+    } catch (error) {
+      showToast(error.message || 'Unable to fetch address for this pincode.', 'error')
+    }
+  }
   // Create Submit Action
   async function handleCreateSubmit(e) {
     e.preventDefault()
@@ -247,8 +299,13 @@ export default function Suppliers() {
         phone: createForm.phone,
         email: createForm.email,
         address: createForm.address,
+        pincode: createForm.pincode,
+        postalCode: createForm.pincode,
+        area: createForm.area,
+        district: createForm.district,
         city: createForm.city,
         state: createForm.state,
+        country: createForm.country,
         estNumber: createForm.estNumber,
         status: createForm.status,
         notes: createForm.notes
@@ -290,8 +347,13 @@ export default function Suppliers() {
         phone: editForm.phone,
         email: editForm.email,
         address: editForm.address,
+        pincode: editForm.pincode,
+        postalCode: editForm.pincode,
+        area: editForm.area,
+        district: editForm.district,
         city: editForm.city,
         state: editForm.state,
+        country: editForm.country,
         estNumber: editForm.estNumber,
         status: editForm.status,
         notes: editForm.notes
@@ -353,8 +415,12 @@ export default function Suppliers() {
       phone: item?.phone || '',
       email: item?.email || '',
       address: item?.address || '',
+      pincode: item?.pincode || item?.postalCode || '',
+      area: item?.area || '',
+      district: item?.district || '',
       city: item?.city || '',
       state: item?.state || '',
+      country: item?.country || '',
       estNumber: item?.estNumber || '',
       status: item?.status || 'Active',
       notes: item?.notes || ''
@@ -561,55 +627,7 @@ export default function Suppliers() {
                         <td>{getLastPurchase(item)}</td>
                         <td>{getStatusBadge(item)}</td>
                         <td>
-                          <div className="admin-action-group">
-                            <button 
-                              type="button" 
-                              className="admin-action-button view" 
-                              aria-label="View Details" 
-                              title="View Details"
-                              onClick={() => openView(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button edit" 
-                              aria-label="Update Details" 
-                              title="Update Details"
-                              onClick={() => openEdit(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button assign" 
-                              style={{ color: '#7c3aed', borderColor: '#ddd6fe', background: '#f5f3ff' }}
-                              aria-label="Purchase History" 
-                              title="Purchase History"
-                              onClick={() => openHistory(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button assign" 
-                              style={{ color: '#0f766e', borderColor: '#99f6e4', background: '#f0fdfa' }}
-                              aria-label="Change Status" 
-                              title="Change Status"
-                              onClick={() => handleStatusChange(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M8 12l3 3 5-6"/><path d="M21 12a9 9 0 1 1-9-9"/></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button danger" 
-                              aria-label="Delete Supplier" 
-                              title="Delete Supplier"
-                              onClick={() => handleDelete(item?._id || item?.id)}
-                            >
-                              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                            </button>
-                          </div>
+                          <RowActions itemName={getSupplierName(item)} isActive={String(item?.status || 'Active').toLowerCase() === 'active'} onView={() => openView(item)} onEdit={() => openEdit(item)} onStatus={() => handleStatusChange(item)} onDelete={() => handleDelete(item?._id || item?.id)} />
                         </td>
                       </tr>
                     )) : (
@@ -732,6 +750,17 @@ export default function Suppliers() {
                       {createErrors.status && (
                         <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{createErrors.status}</span>
                       )}
+                    </div>                    <div className="sup-form-group">
+                      <label>Pincode</label>
+                      <input type="text" id="create-pincode" value={createForm.pincode} onChange={(e) => handleSupplierPincodeChange('create', e.target.value)} />
+                    </div>
+                    <div className="sup-form-group">
+                      <label>Area</label>
+                      <input type="text" id="create-area" value={createForm.area} onChange={(e) => setCreateForm({...createForm, area: e.target.value})} />
+                    </div>
+                    <div className="sup-form-group">
+                      <label>District</label>
+                      <input type="text" id="create-district" value={createForm.district} onChange={(e) => setCreateForm({...createForm, district: e.target.value})} />
                     </div>
                     <div className="sup-form-group">
                       <label>City</label>
@@ -750,6 +779,9 @@ export default function Suppliers() {
                         value={createForm.state} 
                         onChange={(e) => setCreateForm({...createForm, state: e.target.value})} 
                       />
+                    </div>                    <div className="sup-form-group">
+                      <label>Country</label>
+                      <input type="text" id="create-country" value={createForm.country} onChange={(e) => setCreateForm({...createForm, country: e.target.value})} />
                     </div>
                     <div className="sup-form-group full-width">
                       <label>Address</label>
@@ -883,6 +915,17 @@ export default function Suppliers() {
                       {editErrors.status && (
                         <span className="form-error-msg" style={{ color: '#ef4444', fontSize: '11px', marginTop: '2px' }}>{editErrors.status}</span>
                       )}
+                    </div>                    <div className="sup-form-group">
+                      <label>Pincode</label>
+                      <input type="text" id="edit-pincode" value={editForm.pincode} onChange={(e) => handleSupplierPincodeChange('edit', e.target.value)} />
+                    </div>
+                    <div className="sup-form-group">
+                      <label>Area</label>
+                      <input type="text" id="edit-area" value={editForm.area} onChange={(e) => setEditForm({...editForm, area: e.target.value})} />
+                    </div>
+                    <div className="sup-form-group">
+                      <label>District</label>
+                      <input type="text" id="edit-district" value={editForm.district} onChange={(e) => setEditForm({...editForm, district: e.target.value})} />
                     </div>
                     <div className="sup-form-group">
                       <label>City</label>
@@ -901,6 +944,9 @@ export default function Suppliers() {
                         value={editForm.state} 
                         onChange={(e) => setEditForm({...editForm, state: e.target.value})} 
                       />
+                    </div>                    <div className="sup-form-group">
+                      <label>Country</label>
+                      <input type="text" id="edit-country" value={editForm.country} onChange={(e) => setEditForm({...editForm, country: e.target.value})} />
                     </div>
                     <div className="sup-form-group full-width">
                       <label>Address</label>
@@ -1065,3 +1111,8 @@ export default function Suppliers() {
     </AdminLayout>
   )
 }
+
+
+
+
+

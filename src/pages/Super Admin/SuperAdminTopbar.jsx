@@ -17,7 +17,7 @@ function listFrom(response) {
   )
 }
 
-function SuperAdminTopbar({ onMenu, placeholder = 'Search dashboard, branches, admins, reports...' }) {
+function SuperAdminTopbar({ onMenu, placeholder = 'Search dashboard, pharmacies, admins, reports...' }) {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [showResults, setShowResults] = useState(false)
@@ -127,5 +127,6 @@ function SuperAdminTopbar({ onMenu, placeholder = 'Search dashboard, branches, a
 }
 
 export default SuperAdminTopbar
+
 
 

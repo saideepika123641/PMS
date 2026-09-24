@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useToast } from '../../components/ToastProvider'
+import RowActions from '../../components/RowActions'
 import AdminLayout from './AdminLayout'
 import { 
   dispensePrescription, 
@@ -167,7 +168,7 @@ export default function Dispensing() {
     setLoading(true)
     try {
       const id = item?._id || item?.id
-      const response = await recordPayment({ billId: id, amount: item?.amount || item?.totalPrice || 100, method: 'cash' })
+      const response = await recordPayment({ billId: id, paidAmount: item?.amount || item?.totalPrice || item?.total || 100, paymentMode: 'Cash', transactionId: item?.transactionId || '' })
       showToast(response?.message || 'Payment recorded successfully!')
       await loadActiveTab('payments')
       loadSummary()
@@ -451,53 +452,7 @@ export default function Dispensing() {
                         <td>{getDispenseBadge(item)}</td>
                         <td>{getDate(item)}</td>
                         <td>
-                          <div className="admin-action-group">
-                            <button 
-                              type="button" 
-                              className="admin-action-button view" 
-                              aria-label="View Details" 
-                              title="View Details"
-                              onClick={() => handleView(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button edit" 
-                              aria-label="Dispense Medicine" 
-                              title="Dispense Medicine"
-                              onClick={() => handleDispense(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="m14.5 4.5 5 5a4.24 4.24 0 0 1-6 6l-5-5a4.24 4.24 0 0 1 6-6Z"/><path d="m10 9 5 5"/></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button edit" 
-                              aria-label="Generate Bill" 
-                              title="Generate Bill"
-                              onClick={() => handleGenerateBill(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button view" 
-                              aria-label="Get Invoice" 
-                              title="Get Invoice"
-                              onClick={() => handleInvoice(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button assign" 
-                              aria-label="Record Payment" 
-                              title="Record Payment"
-                              onClick={() => handlePayment(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/><circle cx="12" cy="15" r="2"/></svg>
-                            </button>
-                          </div>
+                          <RowActions itemName={getRxId(item)} onView={() => handleView(item)} onEdit={() => handleDispense(item)} statusDisabled={true} onDelete={() => handleInvoice(item)} />
                         </td>
                       </tr>
                     )) : (
@@ -521,3 +476,7 @@ export default function Dispensing() {
     </AdminLayout>
   )
 }
+
+
+
+

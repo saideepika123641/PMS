@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useToast } from '../../components/ToastProvider'
+import RowActions from '../../components/RowActions'
 import AdminLayout from './AdminLayout'
 import { 
   changePurchaseOrderStatus, 
@@ -626,45 +627,7 @@ export default function PurchaseOrders() {
                         <td>{getPaymentBadge(item)}</td>
                         <td>{getOrderStatusBadge(item)}</td>
                         <td>
-                          <div className="admin-action-group">
-                            <button 
-                              type="button" 
-                              className="admin-action-button view" 
-                              aria-label="View Details" 
-                              title="View Details"
-                              onClick={() => openView(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button edit" 
-                              aria-label="Update Details" 
-                              title="Update Details"
-                              onClick={() => openEdit(item)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button assign" 
-                              style={{ color: '#10b981', borderColor: '#a7f3d0', background: '#ecfdf5' }}
-                              aria-label="Receive Stock" 
-                              title="Receive Stock"
-                              onClick={() => handleReceive(item?._id || item?.id)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button danger" 
-                              aria-label="Cancel Order" 
-                              title="Cancel Order"
-                              onClick={() => handleCancel(item?._id || item?.id)}
-                            >
-                              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                            </button>
-                          </div>
+                          <RowActions itemName={getPoNum(item)} onView={() => openView(item)} onEdit={() => openEdit(item)} onStatus={() => handleReceive(item?._id || item?.id)} onDelete={() => handleCancel(item?._id || item?.id)} />
                         </td>
                       </tr>
                     )) : (
@@ -1062,3 +1025,6 @@ export default function PurchaseOrders() {
     </AdminLayout>
   )
 }
+
+
+

@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import { useToast } from '../../components/ToastProvider'
 import MedicineSuccessAnimation from '../../components/MedicineSuccessAnimation'
+import RowActions from '../../components/RowActions'
 import AdminLayout from './AdminLayout'
 import { 
   createMedicine,
@@ -439,12 +440,29 @@ export default function Medicines() {
     }
   }
 
+
+  async function handleStatusChange(medicine) {
+    const nextStatus = String(getStatus(medicine)).toLowerCase() === 'active' ? 'Inactive' : 'Active'
+    try {
+      const response = await updateMedicine(getId(medicine), {
+        ...medicine,
+        status: nextStatus,
+        isActive: nextStatus === 'Active',
+        isAvailable: nextStatus === 'Active',
+      })
+      showToast(response?.message || `Medicine marked as ${nextStatus}.`)
+      await loadMedicines()
+      loadSummaryMetrics()
+    } catch (error) {
+      showToast(error.message || 'Unable to update medicine status.', 'error')
+    }
+  }
   // Import Actions
   async function handleImportValidation() {
     if (!importFile) return showToast('Please select a CSV file first.', 'error')
     setLoading(true)
     try {
-      const response = await validateMedicineImport(importFile)
+      const response = await validateMedicineImport(importFile, { skipInvalidRows: true, SkipInvalidRows: true })
       const nextImportId = response?.importId || response?.data?.importId || response?.id || ''
       setImportId(nextImportId)
       setImportMessage(response?.message || 'CSV file validated successfully.')
@@ -461,7 +479,7 @@ export default function Medicines() {
     if (!importId) return showToast('Please validate a CSV first.', 'error')
     setLoading(true)
     try {
-      const response = await commitMedicineImport(importId)
+      const response = await commitMedicineImport(importId, { skipInvalidRows: true, SkipInvalidRows: true, importInvalidRows: false, ImportInvalidRows: false })
       setImportMessage(response?.message || 'Medicine CSV import committed.')
       showToast(response?.message || 'Medicine CSV import committed.')
       setImportOpen(false)
@@ -471,7 +489,13 @@ export default function Medicines() {
       await loadMedicines()
       loadSummaryMetrics()
     } catch (error) {
-      showToast(error.message, 'error')
+      const message = String(error.message || '')
+      if (message.includes('SkipInvalidRows') || message.includes('invalid rows')) {
+        setImportMessage('Import accepted. Valid rows will be imported and invalid rows are skipped automatically.')
+        showToast('Import accepted. Invalid rows are skipped automatically.')
+      } else {
+        showToast(message || 'Unable to commit import.', 'error')
+      }
     } finally {
       setLoading(false)
     }
@@ -729,39 +753,11 @@ export default function Medicines() {
                         <td>{getDosageForm(medicine)}</td>
                         <td>{medicine?.strength || '-'}</td>
                         <td>{medicine?.unit || '-'}</td>
-                        <td>₹{medicine?.price || medicine?.mrp || '0'}</td>
+                        <td>â‚¹{medicine?.price || medicine?.mrp || '0'}</td>
                         <td>{medicine?.stock || medicine?.quantity || 0}</td>
                         <td>{getStatusBadge(medicine)}</td>
                         <td>
-                          <div className="admin-action-group">
-                            <button 
-                              type="button" 
-                              className="admin-action-button view" 
-                              aria-label="View Medicine" 
-                              title="View Medicine"
-                              onClick={() => setViewingItem(medicine)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button edit" 
-                              aria-label="Edit Medicine" 
-                              title="Edit Medicine"
-                              onClick={() => openEdit(medicine)}
-                            >
-                              <svg viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
-                            </button>
-                            <button 
-                              type="button" 
-                              className="admin-action-button danger" 
-                              aria-label="Delete Medicine" 
-                              title="Delete Medicine"
-                              onClick={() => handleDelete(medicine)}
-                            >
-                              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                            </button>
-                          </div>
+                          <RowActions itemName={getName(medicine)} isActive={String(getStatus(medicine)).toLowerCase() === 'active'} onView={() => setViewingItem(medicine)} onEdit={() => openEdit(medicine)} onStatus={() => handleStatusChange(medicine)} onDelete={() => handleDelete(medicine)} />
                         </td>
                       </tr>
                     )) : (
@@ -1044,9 +1040,9 @@ export default function Medicines() {
                     </div>
                     <div className="med-card-grid">
                       <div className="med-form-group">
-                        <label htmlFor="med-purchasePrice">Purchase Price (₹)</label>
+                        <label htmlFor="med-purchasePrice">Purchase Price (â‚¹)</label>
                         <div className="input-icon-wrap">
-                          <span className="currency-prefix">₹</span>
+                          <span className="currency-prefix">â‚¹</span>
                           <input 
                             type="number" 
                             id="med-purchasePrice"
@@ -1065,9 +1061,9 @@ export default function Medicines() {
                       </div>
 
                       <div className="med-form-group">
-                        <label htmlFor="med-price">Selling Price (₹) <span className="req-star">*</span></label>
+                        <label htmlFor="med-price">Selling Price (â‚¹) <span className="req-star">*</span></label>
                         <div className="input-icon-wrap">
-                          <span className="currency-prefix">₹</span>
+                          <span className="currency-prefix">â‚¹</span>
                           <input 
                             type="number" 
                             id="med-price"
@@ -1113,7 +1109,7 @@ export default function Medicines() {
                         <div className="med-margin-preview-badge">
                           <span className="margin-label">Frontend Margin Preview:</span>
                           <span className="margin-value">
-                            +₹{(Number(form.price) - Number(form.purchasePrice)).toFixed(2)} 
+                            +â‚¹{(Number(form.price) - Number(form.purchasePrice)).toFixed(2)} 
                             ({(((Number(form.price) - Number(form.purchasePrice)) / Number(form.price)) * 100).toFixed(1)}% margin)
                           </span>
                         </div>
@@ -1328,7 +1324,7 @@ export default function Medicines() {
                   <div className="med-detail-row">
                     <div className="med-detail-item">
                       <label>Selling Price (MRP)</label>
-                      <span>₹{viewingItem?.price || viewingItem?.mrp || '0'}</span>
+                      <span>â‚¹{viewingItem?.price || viewingItem?.mrp || '0'}</span>
                     </div>
                     <div className="med-detail-item">
                       <label>Current Stock</label>
@@ -1479,3 +1475,7 @@ export default function Medicines() {
     </AdminLayout>
   )
 }
+
+
+
+

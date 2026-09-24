@@ -20,6 +20,17 @@ function adminCount(response) {
   return admins?.length || 0
 }
 
+function pharmacyRows(response) {
+  const admins = [response, response?.data, response?.data?.admins, response?.admins, response?.data?.results, response?.results].find(Array.isArray) || []
+  const unique = new Map()
+  admins.forEach((item) => {
+    const admin = item?.admin || item?.data?.admin || item
+    const key = admin?.pharmacyId || admin?.PharmacyId || admin?.pharmacyName || admin?.PharmacyName || admin?.email || admin?.id
+    if (key && !unique.has(String(key))) unique.set(String(key), admin)
+  })
+  return [...unique.values()]
+}
+
 function series(source) {
   const values = items(source, ['salesOverview', 'monthlySales', 'revenueByMonth', 'salesByMonth', 'revenue'])
   if (Array.isArray(values)) return values
@@ -47,8 +58,8 @@ function expiryStatus(item) {
 }
 
 function SmallTable({ type, rows }) {
-  const isBranches = type === 'Branches'
-  const columns = isBranches ? ['Branch Name', 'Clinic', 'Location', 'Status'] : ['Medicine Name', 'Category', 'Manufacturer', 'Stock', 'Min. Stock', 'Status']
+  const isPharmacies = type === 'Pharmacies'
+  const columns = isPharmacies ? ['Pharmacy Name', 'Contact', 'Address', 'Email', 'Status'] : ['Medicine Name', 'Category', 'Manufacturer', 'Stock', 'Min. Stock', 'Status']
 
   return (
     <div className="reference-table-wrap">
@@ -57,11 +68,12 @@ function SmallTable({ type, rows }) {
         <tbody>
           {rows.length ? rows.slice(0, 4).map((row, index) => (
             <tr key={pick(row, ['_id', 'id', 'branchId', 'medicineId', 'sku'], index)}>
-              {isBranches ? (
+              {isPharmacies ? (
                 <>
-                  <td>{pick(row, ['branchName', 'name', 'title'])}</td>
-                  <td>{pick(row, ['clinicName', 'hospitalName', 'clinic'])}</td>
-                  <td>{pick(row, ['location', 'address', 'city'])}</td>
+                  <td>{pick(row, ['pharmacyName', 'PharmacyName', 'name'], '-')}</td>
+                  <td>{pick(row, ['pharmacyContactNumber', 'mobileNumber', 'phone'], '-')}</td>
+                  <td>{[pick(row, ['pharmacyAddress', 'address'], ''), [pick(row, ['city'], ''), pick(row, ['state'], ''), pick(row, ['country'], ''), pick(row, ['postalCode'], '')].filter(Boolean).join(', ')].filter(Boolean).join(', ') || '-'}</td>
+                  <td>{pick(row, ['pharmacyEmail', 'email'], '-')}</td>
                 </>
               ) : (
                 <>
@@ -72,7 +84,7 @@ function SmallTable({ type, rows }) {
                   <td>{pick(row, ['minStock', 'minimumStock', 'reorderLevel', 'minimumLevel'], 0)}</td>
                 </>
               )}
-              <td><span className={`reference-status ${(isBranches ? rowStatus(row) : stockStatus(row)).toLowerCase()}`}>{isBranches ? rowStatus(row) : stockStatus(row)}</span></td>
+              <td><span className={`reference-status ${(isPharmacies ? rowStatus(row) : stockStatus(row)).toLowerCase()}`}>{isPharmacies ? rowStatus(row) : stockStatus(row)}</span></td>
             </tr>
           )) : <tr><td colSpan={columns.length}>No {type.toLowerCase()} available.</td></tr>}
         </tbody>
@@ -114,6 +126,7 @@ function SuperAdminDashboard() {
           setData({
             ...dashboard,
             analytics,
+            pharmacies: adminsResult.status === 'fulfilled' ? pharmacyRows(adminsResult.value) : [],
             expiryAlerts: items(expiry, ['expiryAlerts', 'nearExpiryMedicines', 'nearExpiryInventory', 'items', 'results', 'data']),
             medicineInventory: items(lowStock, ['lowStock', 'lowStockMedicines', 'items', 'results', 'data']),
           })
@@ -126,19 +139,19 @@ function SuperAdminDashboard() {
 
   const view = useMemo(() => {
     const summary = data?.summary || data?.stats || data?.counts || data || {}
-    const branchRows = items(data, ['branches', 'branchPerformance', 'branchesPerformance'])
+    const pharmacyRowsData = items(data, ['pharmacies', 'pharmacyRows', 'pharmacyList'])
     const medicineRows = items(data, ['medicines', 'medicineInventory', 'inventory', 'medicineList'])
     const expiryRows = items(data, ['expiryAlerts', 'nearExpiryMedicines', 'nearExpiryInventory', 'expiringMedicines'])
     return {
-      branchCount: pick(summary, ['totalBranches', 'branchesCount', 'branches'], branchRows.length),
-      activeBranches: pick(summary, ['activeBranches', 'activeBranchCount'], branchRows.filter((item) => rowStatus(item).toLowerCase() === 'active').length),
+      pharmacyCount: pick(summary, ['totalPharmacies', 'pharmaciesCount', 'pharmacies'], pharmacyRowsData.length),
+      activePharmacies: pick(summary, ['activePharmacies', 'activePharmacyCount'], pharmacyRowsData.filter((item) => rowStatus(item).toLowerCase() === 'active').length),
       admins: adminTotal ?? pick(summary, ['totalAdmins', 'adminsCount', 'adminCount', 'admins', 'totalUsers'], 0),
       revenue: money(pick(summary, ['monthlySales', 'monthlyRevenue', 'revenue', 'totalRevenue', 'totalSales'], 0)),
       salesChange: percent(pick(summary, ['salesChange', 'revenueChange', 'monthlySalesChange', 'changePercentage'], 0)),
       lowStock: pick(summary, ['lowStockAlerts', 'lowStockCount', 'lowStockMedicines'], medicineRows.filter((item) => ['critical', 'low'].includes(stockStatus(item).toLowerCase())).length),
       criticalStock: pick(summary, ['criticalItems', 'criticalStockCount'], medicineRows.filter((item) => stockStatus(item).toLowerCase() === 'critical').length),
       salesSeries: series(data),
-      branchRows,
+      pharmacyRows: pharmacyRowsData,
       medicineRows,
       expiry: expiryRows,
       activities: items(data, ['recentActivities', 'activities', 'activityLogs']),
@@ -160,7 +173,7 @@ function SuperAdminDashboard() {
   const salesPoints = timeRange === 'Last 6 Months' ? allSalesPoints.slice(-6) : allSalesPoints.slice(-12)
   const heights = salesPoints.map((point) => point.value)
   const highest = Math.max(...heights, 1)
-  const branchSales = view.branchRows.map((branch) => ({ name: pick(branch, ['branchName', 'name', 'title'], '-'), value: numeric(pick(branch, ['sales', 'amount', 'totalSales', 'revenue'], 0)) })).filter((branch) => branch.value > 0)
+  const branchSales = view.pharmacyRows.map((branch) => ({ name: pick(branch, ['pharmacyName', 'name', 'title'], '-'), value: numeric(pick(branch, ['sales', 'amount', 'totalSales', 'revenue'], 0)) })).filter((branch) => branch.value > 0)
   const totalBranchSales = branchSales.reduce((total, branch) => total + branch.value, 0) || 1
   let branchOffset = 0
   const donutStops = branchSales.map((branch, index) => {
@@ -169,19 +182,13 @@ function SuperAdminDashboard() {
     return `${['#2563eb', '#4fb49a', '#8b6dcc', '#f0a33b', '#94a3b8'][index % 5]} ${start}deg ${branchOffset}deg`
   }).join(', ')
 
-  const clinicNames = view.branchRows.length >= 3
-    ? view.branchRows.slice(0, 3).map((b) => pick(b, ['branchName', 'name', 'title'], 'Clinic'))
-    : ['Abc Clinic', 'Sahastra Clinic', 'Aparna Clinic']
-  const recentActivities = view.activities.length ? view.activities.slice(0, 3).map((a) => ({
-    title: pick(a, ['title', 'action', 'event', 'type'], 'Updated branch'),
-    description: pick(a, ['message', 'text', 'description'], 'Branches - Super Admin'),
-    time: pick(a, ['timeAgo', 'time', 'createdAt'], '16 Sept 2026, 11:56 am'),
+  const clinicNames = view.pharmacyRows.slice(0, 3).map((b) => pick(b, ['pharmacyName', 'name', 'title'], 'Pharmacy'))
+  const recentActivities = view.activities.slice(0, 3).map((a) => ({
+    title: pick(a, ['title', 'action', 'event', 'type'], 'Activity'),
+    description: pick(a, ['message', 'text', 'description'], 'Platform activity'),
+    time: pick(a, ['timeAgo', 'time', 'createdAt'], '-'),
     isLogin: String(pick(a, ['title', 'action', 'type'], '')).toLowerCase().includes('login')
-  })) : [
-    { title: 'Updated branch', description: 'Branches - Super Admin', time: '16 Sept 2026, 11:56 am', isLogin: false },
-    { title: 'Login', description: 'Login - Super Admin', time: '16 Sept 2026, 11:54 am', isLogin: true },
-    { title: 'Updated branch', description: 'Branches - Super Admin', time: '16 Sept 2026, 11:50 am', isLogin: false }
-  ]
+  }))
 
   return (
     <div className={`super-admin-shell reference-dashboard${open ? ' sidebar-open' : ''}`}>
@@ -194,7 +201,7 @@ function SuperAdminDashboard() {
           <div className="reference-heading-accent" />
           <div>
             <h1>Super Admin Dashboard</h1>
-            <p>Platform-wide branches, revenue, and operational activity.</p>
+            <p>Platform-wide pharmacies, revenue, and operational activity.</p>
           </div>
         </section>
 
@@ -209,8 +216,8 @@ function SuperAdminDashboard() {
                   </svg>
                 </div>
                 <div className="stat-content">
-                  <strong>{view.branchCount || 3}</strong>
-                  <span>Total Branches</span>
+                  <strong>{view.pharmacyCount}</strong>
+                  <span>Total Pharmacies</span>
                 </div>
               </article>
 
@@ -221,7 +228,7 @@ function SuperAdminDashboard() {
                   </svg>
                 </div>
                 <div className="stat-content">
-                  <strong>{view.admins || 2}</strong>
+                  <strong>{view.admins}</strong>
                   <span>Total Admins</span>
                 </div>
               </article>
@@ -241,7 +248,7 @@ function SuperAdminDashboard() {
               <article className="reference-card-charts">
                 <div className="charts-header">
                   <h2>Charts & Statistics</h2>
-                  <p>Revenue growth across all branches.</p>
+                  <p>Revenue growth across all pharmacies.</p>
                 </div>
                 <div className="chart-grid-area">
                   {[4, 3, 2, 1, 0].map((val) => (
@@ -295,7 +302,7 @@ function SuperAdminDashboard() {
               </article>
             </section>
             <section className="reference-directory">
-              <article className="reference-card"><header><div><h2>Branches</h2><p>All registered branches.</p></div><button onClick={() => navigate('/super-admin/branches')} type="button">View All</button></header><SmallTable type="Branches" rows={view.branchRows} /></article>
+              <article className="reference-card"><header><div><h2>Pharmacies</h2><p>All registered pharmacies.</p></div><button onClick={() => navigate('/super-admin/branches')} type="button">View All</button></header><SmallTable type="Pharmacies" rows={view.pharmacyRows} /></article>
               <article className="reference-card"><header><div><h2>Medicines</h2><p>All medicines in inventory.</p></div><button onClick={() => navigate('/super-admin/medicines')} type="button">View All</button></header><SmallTable type="Medicines" rows={view.medicineRows} /></article>
             </section>
             <section className="reference-card expiry-card"><header><div><h2>Expiry Alerts</h2><p>Medicines nearing expiry.</p></div><button onClick={() => navigate('/super-admin/reports')} type="button">View All</button></header><div className="reference-table-wrap"><table className="reference-table"><thead><tr>{['Medicine Name', 'Batch No.', 'Expiry Date', 'Status'].map((column) => <th key={column}>{column}</th>)}</tr></thead><tbody>{view.expiry.length ? view.expiry.slice(0, 5).map((row, index) => { const status = expiryStatus(row); return <tr key={pick(row, ['_id', 'id', 'batchNo'], index)}><td>{pick(row, ['medicineName', 'name', 'medicine'])}</td><td>{pick(row, ['batchNo', 'batchNumber', 'batch'])}</td><td>{pick(row, ['expiryDate', 'expiresAt', 'expiry'])}</td><td><span className={`reference-status ${status.days <= 7 ? 'critical' : 'low'}`}>{status.label}</span></td></tr> }) : <tr><td colSpan="4">No expiry alerts available.</td></tr>}</tbody></table></div></section>
@@ -313,4 +320,6 @@ function SuperAdminDashboard() {
 }
 
 export default SuperAdminDashboard
+
+
 

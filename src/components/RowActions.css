@@ -1,0 +1,36 @@
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.row-action-button {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1f2937;
+  background: #eef4ff;
+  transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+}
+
+.row-action-button svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.row-action-button.view { background: #e0f2fe; color: #0369a1; }
+.row-action-button.edit { background: #ecfdf5; color: #047857; }
+.row-action-button.status { background: #fff7ed; color: #c2410c; }
+.row-action-button.delete { background: #fee2e2; color: #b91c1c; }
+.row-action-button:disabled { opacity: 0.38; cursor: not-allowed; }
+.row-action-button:not(:disabled):hover { transform: translateY(-1px); filter: saturate(1.08); }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import UserProfileMenu from '../../components/UserProfileMenu'
 import AdminSidebar from './AdminSidebar'
 import { adminNavigation } from './adminNavigation'
+import { hasPermission, readAdminPermissions } from '../../config/permissions'
 import './AdminTopbar.css'
 import './admin.css'
 
@@ -30,12 +31,14 @@ function AdminLayout({ activeLabel, title, subtitle, headerAction, children }) {
   const adminName = user?.name || user?.fullName || user?.email || 'Admin'
   const hospitalName = assignment?.hospitalName || assignment?.hospital?.name || assignment?.clinicName || assignment?.clinic?.name || 'PMS'
   const branchName = assignment?.branchName || assignment?.branch?.name || assignment?.pharmacyName || assignment?.pharmacy?.name || 'Admin Console'
+  const permissions = readAdminPermissions()
+  const visibleNavigation = useMemo(() => adminNavigation.filter((item) => item.label === 'Dashboard' || hasPermission(permissions, item.label, 'view')), [permissions])
   
   const results = useMemo(() => {
     const value = query.trim().toLowerCase()
-    if (!value) return adminNavigation
-    return adminNavigation.filter((item) => item.label.toLowerCase().includes(value))
-  }, [query])
+    if (!value) return visibleNavigation
+    return visibleNavigation.filter((item) => item.label.toLowerCase().includes(value))
+  }, [query, visibleNavigation])
 
   function goTo(path) {
     setQuery('')
@@ -80,7 +83,7 @@ function AdminLayout({ activeLabel, title, subtitle, headerAction, children }) {
                 setShowResults(true)
               }}
               onFocus={() => setShowResults(true)}
-              placeholder="Search dashboard, medicines, users, reports..."
+              placeholder="Search dashboard, medicines, pharmacists, reports..."
             />
             {showResults ? (
               <div className="branch-admin-search-results">
@@ -122,3 +125,4 @@ function AdminLayout({ activeLabel, title, subtitle, headerAction, children }) {
 }
 
 export default AdminLayout
+

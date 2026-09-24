@@ -1,3 +1,352 @@
 .super-admin-module-panel {
   min-height: 360px;
 }
+
+/* Reference-style branch table */
+.super-admin-module-panel:has(.branches-name-cell) {
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #dce7f1;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(15, 57, 84, 0.08);
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .super-admin-module-header {
+  padding: 22px 28px 6px;
+  margin-bottom: 0;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .super-admin-module-table {
+  overflow-x: auto;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) table {
+  min-width: 1060px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) th {
+  height: 56px;
+  padding: 0 28px;
+  border-bottom: 1px solid #dbe5ef;
+  background: #f8fafc;
+  color: #1d3f91;
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) td {
+  height: 98px;
+  padding: 0 28px;
+  border-bottom: 1px solid #edf2f7;
+  color: #081a38;
+  font-size: 1rem;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) th:first-child,
+.super-admin-module-panel:has(.branches-name-cell) td:first-child {
+  width: 78px;
+  text-align: center;
+}
+
+.branches-serial {
+  color: #020617;
+  font-weight: 900;
+}
+
+.branches-name-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 210px;
+}
+
+.branches-location-icon {
+  width: 60px;
+  height: 60px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #b9e5ff;
+  border-radius: 18px;
+  background: #e0f4ff;
+  color: #0284c7;
+  box-shadow: 0 8px 18px rgba(14, 165, 233, 0.12);
+}
+
+.branches-location-icon .permissions-icon,
+.branches-location-icon svg {
+  width: 25px;
+  height: 25px;
+}
+
+.branches-name-cell strong,
+.branches-contact-cell strong {
+  display: block;
+  color: #020617;
+  font-size: 1rem;
+  line-height: 1.25;
+  font-weight: 900;
+}
+
+.branches-name-cell small,
+.branches-contact-cell small {
+  display: block;
+  margin-top: 4px;
+  color: #334155;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.branches-location-text {
+  display: block;
+  max-width: 330px;
+  overflow: hidden;
+  color: #1e293b;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.branches-status-pill {
+  min-width: 150px;
+  min-height: 45px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 900;
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.2);
+}
+
+.branches-status-pill i {
+  width: 17px;
+  height: 17px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+.branches-status-pill svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.branches-status-pill.active {
+  border: 2px solid #34d399;
+  background: #bff7df;
+  color: #047857;
+}
+
+.branches-status-pill.inactive {
+  border: 2px solid #fca5a5;
+  background: #fee2e2;
+  color: #dc2626;
+  box-shadow: 0 10px 24px rgba(239, 68, 68, 0.16);
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-actions {
+  gap: 14px;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-action-button {
+  width: 60px;
+  height: 60px;
+  border-radius: 14px;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-action-button.view {
+  border-color: #bae6fd;
+  background: #e0f4ff;
+  color: #0284c7;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-action-button.edit {
+  border-color: #ddd6fe;
+  background: #f3e8ff;
+  color: #7c3aed;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-action-button.status {
+  border-color: #86efac;
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-action-button.delete {
+  border-color: #fca5a5;
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-action-button svg {
+  width: 25px;
+  height: 25px;
+  stroke-width: 2.4;
+}
+
+/* Compact branch table so all columns fit on one screen */
+.super-admin-module-panel:has(.branches-name-cell) .super-admin-module-header {
+  padding: 14px 24px 8px;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .super-admin-module-table {
+  overflow-x: hidden;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) th {
+  height: 42px;
+  padding: 0 10px;
+  font-size: 0.72rem;
+  line-height: 1.1;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) td {
+  height: 64px;
+  padding: 0 10px;
+  font-size: 0.72rem;
+  line-height: 1.2;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) th:nth-child(1),
+.super-admin-module-panel:has(.branches-name-cell) td:nth-child(1) {
+  width: 54px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) th:nth-child(2),
+.super-admin-module-panel:has(.branches-name-cell) td:nth-child(2) {
+  width: 30%;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) th:nth-child(3),
+.super-admin-module-panel:has(.branches-name-cell) td:nth-child(3) {
+  width: 24%;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) th:nth-child(4),
+.super-admin-module-panel:has(.branches-name-cell) td:nth-child(4) {
+  width: 24%;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) th:nth-child(5),
+.super-admin-module-panel:has(.branches-name-cell) td:nth-child(5) {
+  width: 104px;
+  text-align: center;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) th:nth-child(6),
+.super-admin-module-panel:has(.branches-name-cell) td:nth-child(6) {
+  width: 172px;
+  text-align: center;
+}
+
+.branches-name-cell {
+  gap: 10px;
+  min-width: 0;
+  width: 100%;
+}
+
+.branches-location-icon {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 12px;
+}
+
+.branches-location-icon .permissions-icon,
+.branches-location-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.branches-name-cell > span:last-child,
+.branches-contact-cell {
+  min-width: 0;
+}
+
+.branches-name-cell strong,
+.branches-contact-cell strong {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.78rem;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.branches-name-cell small,
+.branches-contact-cell small {
+  max-width: 100%;
+  overflow: hidden;
+  margin-top: 3px;
+  font-size: 0.68rem;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.branches-location-text {
+  max-width: 100%;
+  font-size: 0.74rem;
+  line-height: 1.2;
+}
+
+.branches-status-pill {
+  min-width: 88px;
+  min-height: 30px;
+  gap: 5px;
+  padding: 0 9px;
+  font-size: 0.68rem;
+}
+
+.branches-status-pill i {
+  width: 10px;
+  height: 10px;
+}
+
+.branches-status-pill svg {
+  width: 14px;
+  height: 14px;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-actions {
+  gap: 7px;
+  justify-content: center;
+  flex-wrap: nowrap;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-action-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+}
+
+.super-admin-module-panel:has(.branches-name-cell) .row-action-button svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2.2;
+}

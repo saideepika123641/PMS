@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useToast } from '../../components/ToastProvider'
+import RowActions from '../../components/RowActions'
 import {
   assignPharmacistToAdminPharmacy,
   changePharmacistStatus,
   createPharmacist,
   deletePharmacist,
   getPharmacistPermissions,
+  listPharmacyBranches,
   listPharmacists,
   resetPharmacistPassword,
   updatePharmacist,
@@ -14,20 +16,65 @@ import {
 } from '../../config/api'
 import AdminLayout from './AdminLayout'
 
-const emptyForm = { name: '', email: '', phone: '', password: '' }
+const emptyForm = { name: '', email: '', phone: '', password: '', branchId: '' }
 const permissionKeys = ['prescriptions', 'dispensing', 'stock', 'reports']
 
 function normalizeList(response) {
   if (Array.isArray(response)) return response
   if (Array.isArray(response?.data)) return response.data
   if (Array.isArray(response?.data?.pharmacists)) return response.data.pharmacists
+  if (Array.isArray(response?.data?.branches)) return response.data.branches
   if (Array.isArray(response?.pharmacists)) return response.pharmacists
+  if (Array.isArray(response?.branches)) return response.branches
   if (Array.isArray(response?.results)) return response.results
   return []
 }
 
 function getId(item) {
   return item?._id || item?.id || item?.pharmacistId || item?.uuid
+}
+
+function branchIdOf(item) {
+  return item?._id || item?.id || item?.branchId || item?.BranchId || ''
+}
+
+function branchNameOf(item) {
+  return item?.name || item?.branchName || item?.BranchName || item?.pharmacyName || item?.PharmacyName || 'Branch'
+}
+
+function readStoredJson(key) {
+  try {
+    const raw = sessionStorage.getItem(key) || localStorage.getItem(key)
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
+
+function mainBranchFromPharmacy() {
+  const assignment = readStoredJson('pharmacyAdminAssignment') || {}
+  const user = readStoredJson('pharmacyAdminUser') || {}
+  const pharmacy = assignment.pharmacy || user.pharmacy || {}
+  const branchId = assignment.branchId || assignment.BranchId || assignment.branch?.id || assignment.branch?.branchId || user.branchId || user.BranchId || user.branch?.id || user.branch?.branchId
+  const id = branchId
+  const pharmacyName = assignment.pharmacyName || pharmacy.name || user.pharmacyName || user.pharmacy?.name || assignment.branchName || user.branchName
+  if (!pharmacyName) return null
+  return {
+    id,
+    branchId: id,
+    name: pharmacyName,
+    branchName: `${pharmacyName} - Main Branch`,
+    pharmacyName,
+    isMainBranch: true,
+  }
+}
+function storedBranchId() {
+  const working = sessionStorage.getItem('workingBranchId') || localStorage.getItem('workingBranchId')
+  if (working) return working
+  const assignment = readStoredJson('pharmacyAdminAssignment') || {}
+  const user = readStoredJson('pharmacyAdminUser') || {}
+  return assignment.branchId || assignment.BranchId || assignment.branch?.id || assignment.branch?.branchId || user.branchId || user.BranchId || user.branch?.id || user.branch?.branchId || ''
 }
 
 function getName(item) {
@@ -148,6 +195,9 @@ function Users({ initialAdd = false }) {
   const [pharmacists, setPharmacists] = useState([])
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
+  const [branches, setBranches] = useState([])
+  const [branchesLoading, setBranchesLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [editing, setEditing] = useState(null)
   const [togglingId, setTogglingId] = useState(null)
@@ -159,16 +209,27 @@ function Users({ initialAdd = false }) {
   const [permissions, setPermissions] = useState({})
   const [resetting, setResetting] = useState(null)
   const [temporaryPassword, setTemporaryPassword] = useState('')
+  const mainBranch = useMemo(() => mainBranchFromPharmacy(), [])
+  const branchOptions = useMemo(() => {
+    const options = mainBranch ? [mainBranch, ...branches] : branches
+    const seen = new Set()
+    return options.filter((branch) => {
+      const id = String(branchIdOf(branch) || '')
+      if (!id || seen.has(id)) return false
+      seen.add(id)
+      return true
+    })
+  }, [mainBranch, branches])
 
   useEffect(() => {
     if (location.pathname.endsWith('/add')) {
       setEditing(null)
       setShowPassword(false)
-      setForm({ name: '', email: '', phone: '', password: '' })
+      setForm((prev) => ({ name: '', email: '', phone: '', password: '', branchId: prev.branchId || storedBranchId() }))
       setFormErrors({})
       setFormOpen(true)
       const timer = setTimeout(() => {
-        setForm((prev) => (editing ? prev : { name: '', email: '', phone: '', password: '' }))
+        setForm((prev) => (editing ? prev : { name: '', email: '', phone: '', password: '', branchId: prev.branchId || storedBranchId() }))
       }, 50)
       return () => clearTimeout(timer)
     }
@@ -187,20 +248,48 @@ function Users({ initialAdd = false }) {
 
   async function loadPharmacists() {
     setLoading(true)
+    setLoadError('')
     try {
       const response = await listPharmacists({ search: query })
       setPharmacists(normalizeList(response))
     } catch (error) {
-      showToast(error.message, 'error')
+      const message = error.message || 'Unable to load pharmacists.'
+      setLoadError(message)
+      if (!/View permission for User Management/i.test(message)) showToast(message, 'error')
+      setPharmacists([])
     } finally {
       setLoading(false)
     }
   }
 
   useEffect(() => {
-    loadPharmacists()
-  }, [])
+    if (!isAddRoute) loadPharmacists()
+  }, [isAddRoute])
 
+  useEffect(() => {
+    let mounted = true
+    async function loadBranchesForForm() {
+      if (!isAddRoute && !formOpen) return
+      setBranchesLoading(true)
+      try {
+        const response = await listPharmacyBranches()
+        const list = normalizeList(response)
+        if (!mounted) return
+        setBranches(list)
+        setForm((prev) => {
+          const existing = prev.branchId || storedBranchId()
+          const fallback = existing || branchIdOf(mainBranchFromPharmacy()) || branchIdOf(list[0])
+          return { ...prev, branchId: fallback ? String(fallback) : '' }
+        })
+      } catch (error) {
+        if (mounted) showToast(error.message || 'Unable to load branches for pharmacist assignment.', 'error')
+      } finally {
+        if (mounted) setBranchesLoading(false)
+      }
+    }
+    loadBranchesForForm()
+    return () => { mounted = false }
+  }, [isAddRoute, formOpen])
   const [formErrors, setFormErrors] = useState({})
 
   function validateForm() {
@@ -253,7 +342,7 @@ function Users({ initialAdd = false }) {
   function openCreate() {
     setEditing(null)
     setShowPassword(false)
-    setForm(emptyForm)
+    setForm({ ...emptyForm, branchId: storedBranchId() })
     setFormErrors({})
     setFormOpen(true)
     if (!location.pathname.endsWith('/add')) {
@@ -270,6 +359,7 @@ function Users({ initialAdd = false }) {
       email: pharmacist?.email || pharmacist?.user?.email || pharmacist?.userId?.email || '',
       phone: currentPhone,
       password: '',
+      branchId: pharmacist?.branchId || pharmacist?.BranchId || pharmacist?.branch?.id || pharmacist?.branch?.branchId || storedBranchId(),
     })
     setFormErrors({})
     setFormOpen(true)
@@ -301,7 +391,7 @@ function Users({ initialAdd = false }) {
     setFormOpen(false)
     setEditing(null)
     setShowPassword(false)
-    setForm(emptyForm)
+    setForm({ ...emptyForm, branchId: storedBranchId() })
     setFormErrors({})
     if (location.pathname.endsWith('/add')) {
       navigate('/admin/users')
@@ -313,6 +403,12 @@ function Users({ initialAdd = false }) {
     if (!validateForm()) return
     setSaving(true)
     const phoneVal = (form.phone || '').trim()
+    if (!editing && !form.branchId) {
+      setFormErrors((current) => ({ ...current, branchId: 'Please create or choose a branch before creating a pharmacist.' }))
+      showToast('Please create or choose a branch before creating a pharmacist.', 'error')
+      setSaving(false)
+      return
+    }
     const payload = {
       name: form.name.trim(),
       email: form.email.trim(),
@@ -323,6 +419,7 @@ function Users({ initialAdd = false }) {
       contactNumber: phoneVal,
       contact: phoneVal,
       mobileNo: phoneVal,
+      ...(form.branchId ? { branchId: Number(form.branchId), BranchId: Number(form.branchId) } : {}),
       ...(form.password ? { password: form.password } : {}),
     }
 
@@ -495,7 +592,7 @@ function Users({ initialAdd = false }) {
   if (formOpen) {
     return (
       <AdminLayout
-        activeLabel="Users"
+        activeLabel="Pharmacists"
         title={editing ? 'Edit Pharmacist' : 'Create Pharmacist'}
         subtitle={editing ? 'Update pharmacist credentials and contact details.' : 'Enter new pharmacist information and access credentials.'}
         headerAction={
@@ -517,9 +614,12 @@ function Users({ initialAdd = false }) {
               <h2>{editing ? 'Edit Pharmacist Profile' : 'New Pharmacist Registration'}</h2>
               <p>Fields marked with * are required. Credentials will be used for pharmacist portal login.</p>
             </div>
+            <button className="btn-primary pharmacist-header-submit" type="submit" form="pharmacist-create-form" disabled={saving}>
+              {saving ? 'Saving...' : editing ? 'Save Changes' : 'Create Pharmacist'}
+            </button>
           </div>
 
-          <form onSubmit={handleSave} noValidate autoComplete="off" className="pharmacist-screen-form">
+          <form id="pharmacist-create-form" onSubmit={handleSave} noValidate autoComplete="off" className="pharmacist-screen-form">
             {/* Honeypot fields to absorb browser auto-filling of saved admin credentials */}
             <input type="text" name="fake_username_remembered" style={{ position: 'absolute', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }} tabIndex="-1" autoComplete="off" readOnly defaultValue="" />
             <input type="password" name="fake_password_remembered" style={{ position: 'absolute', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }} tabIndex="-1" autoComplete="new-password" readOnly defaultValue="" />
@@ -584,6 +684,30 @@ function Users({ initialAdd = false }) {
                   <span className="form-error-msg">{formErrors.phone}</span>
                 )}
               </div>
+              <div className="pharmacist-form-field">
+                <label htmlFor="user-branch">Branch *</label>
+                <select
+                  id="user-branch"
+                  name="pharmacist_branch"
+                  value={form.branchId}
+                  onChange={(event) => {
+                    setForm({ ...form, branchId: event.target.value })
+                    if (formErrors.branchId) setFormErrors({ ...formErrors, branchId: '' })
+                  }}
+                  className={formErrors.branchId ? 'has-error' : ''}
+                  required
+                >
+                  <option value="">{branchesLoading ? 'Loading branches...' : branchOptions.length ? 'Select branch' : 'Create a sub branch first'}</option>
+                  {branchOptions.map((branch) => {
+                    const id = branchIdOf(branch)
+                    const label = branch?.isMainBranch ? `${branchNameOf(branch)} - Main Branch` : `${branchNameOf(branch)} - Sub Branch`
+                    return id ? <option key={id} value={id}>{label}</option> : null
+                  })}
+                </select>
+                {formErrors.branchId && (
+                  <span className="form-error-msg">{formErrors.branchId}</span>
+                )}
+              </div>
 
               <div className="pharmacist-form-field">
                 <label htmlFor="user-password">
@@ -642,12 +766,12 @@ function Users({ initialAdd = false }) {
   // MAIN TABLE SCREEN: Pharmacists Directory
   // =========================================================================
   return (
-    <AdminLayout activeLabel="Users" title="Manage Pharmacists" subtitle="Admin / Pharmacists">
+    <AdminLayout activeLabel="Pharmacists" title="Manage Pharmacists" subtitle="Admin / Pharmacists">
       <section className="branch-panel pharmacist-panel">
         <div className="branch-panel-heading">
           <div>
             <h2>Pharmacists</h2>
-            <p>Manage pharmacist access under this admin pharmacy.</p>
+            <p>{loadError || 'Manage pharmacist access under this admin pharmacy.'}</p>
           </div>
           <button type="button" className="btn-primary" onClick={openCreate}>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ marginRight: '6px' }}>
@@ -713,46 +837,7 @@ function Users({ initialAdd = false }) {
                     </button>
                   </td>
                   <td className="pharmacist-actions">
-                    <div className="admin-action-group" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <button type="button" className="action-btn view" aria-label="View Details" title="View Details" onClick={() => openEdit(pharmacist)}>
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
-                      </button>
-                      <button type="button" className="action-btn edit" aria-label="Edit Pharmacist" title="Edit Pharmacist" onClick={() => openEdit(pharmacist)}>
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
-                      </button>
-                      <button type="button" className="action-btn" style={{ background: '#f3e8ff', color: '#9333ea', borderColor: '#e9d5ff' }} aria-label="Permissions" title="Permissions" onClick={() => openPermissions(pharmacist)}>
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="15" r="4" /><path d="m11 12 8-8M15 4h4v4" /></svg>
-                      </button>
-                      <button type="button" className="action-btn" style={{ background: '#e0f2fe', color: '#0284c7', borderColor: '#bae6fd' }} aria-label="Assign Pharmacy" title="Assign Pharmacy" onClick={() => handleAssign(pharmacist)}>
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
-                      </button>
-                      <button
-                        type="button"
-                        className={`action-btn status-toggle ${isPharmacistActive(pharmacist) ? 'is-active' : 'is-inactive'}`}
-                        aria-label={isPharmacistActive(pharmacist) ? 'Deactivate Pharmacist' : 'Activate Pharmacist'}
-                        title={isPharmacistActive(pharmacist) ? 'Active — Click to Deactivate' : 'Inactive — Click to Activate'}
-                        disabled={togglingId === getId(pharmacist)}
-                        onClick={() => handleStatus(pharmacist)}
-                      >
-                        {isPharmacistActive(pharmacist) ? (
-                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="2" y="6" width="20" height="12" rx="6" fill="#10b981" fillOpacity="0.2" />
-                            <circle cx="16" cy="12" r="3.5" fill="currentColor" />
-                          </svg>
-                        ) : (
-                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="2" y="6" width="20" height="12" rx="6" fill="#ef4444" fillOpacity="0.12" />
-                            <circle cx="8" cy="12" r="3.5" fill="currentColor" />
-                          </svg>
-                        )}
-                      </button>
-                      <button type="button" className="action-btn" style={{ background: '#f1f5f9', color: '#475569', borderColor: '#e2e8f0' }} aria-label="Reset Password" title="Reset Password" onClick={() => setResetting(pharmacist)}>
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-                      </button>
-                      <button type="button" className="action-btn danger" aria-label="Delete Pharmacist" title="Delete Pharmacist" onClick={() => handleDelete(pharmacist)}>
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /></svg>
-                      </button>
-                    </div>
+                    <RowActions itemName={getName(pharmacist)} isActive={isPharmacistActive(pharmacist)} onView={() => openEdit(pharmacist)} onEdit={() => openEdit(pharmacist)} onStatus={() => handleStatus(pharmacist)} onDelete={() => handleDelete(pharmacist)} statusDisabled={togglingId === getId(pharmacist)} />
                   </td>
                 </tr>
               )) : null}
@@ -837,3 +922,15 @@ function Users({ initialAdd = false }) {
 }
 
 export default Users
+
+
+
+
+
+
+
+
+
+
+
+

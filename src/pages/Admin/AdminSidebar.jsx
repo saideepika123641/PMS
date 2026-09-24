@@ -1,10 +1,13 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { adminNavigation } from './adminNavigation'
+import { hasPermission, readAdminPermissions } from '../../config/permissions'
 import './AdminSidebar.css'
 
 function AdminSidebar({ activeLabel, hospitalName = 'PMS', branchName = 'Admin Console', adminName = 'Admin' }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const permissions = readAdminPermissions()
+  const visibleNavigation = adminNavigation.filter((item) => item.label === 'Dashboard' || hasPermission(permissions, item.label, 'view'))
 
   return (
     <aside className="branch-admin-sidebar" aria-label="Admin navigation">
@@ -23,7 +26,7 @@ function AdminSidebar({ activeLabel, hospitalName = 'PMS', branchName = 'Admin C
 
       {/* Main Navigation */}
       <nav className="branch-admin-nav">
-        {adminNavigation.map(({ label, path, icon, color }) => {
+        {visibleNavigation.map(({ label, path, icon, color }) => {
           const isActive = activeLabel === label || location.pathname === path
           return (
             <button

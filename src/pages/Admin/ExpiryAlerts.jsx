@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '../../components/ToastProvider'
+import RowActions from '../../components/RowActions'
 import { disposeInventoryBatch, getExpiredInventory, getNearExpiryInventory, getNearExpiryInventoryDetails } from '../../config/api'
 import AdminLayout from './AdminLayout'
 
@@ -246,35 +247,7 @@ export default function ExpiryAlerts() {
                       </span>
                     </td>
                     <td>
-                      <div className="admin-action-group">
-                        <button 
-                          type="button" 
-                          className="admin-action-button view" 
-                          aria-label="View details" 
-                          title="View details"
-                          onClick={() => setViewingItem(item)}
-                        >
-                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></svg>
-                        </button>
-                        <button 
-                          type="button" 
-                          className="admin-action-button edit" 
-                          aria-label="Edit stock" 
-                          title="Edit stock"
-                          onClick={() => handleEdit(item)}
-                        >
-                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" /></svg>
-                        </button>
-                        <button 
-                          type="button" 
-                          className="admin-action-button danger" 
-                          aria-label="Dispose batch" 
-                          title="Dispose batch"
-                          onClick={() => handleDispose(item)}
-                        >
-                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18" /><path d="M8 6V4h8v2" /><path d="M19 6l-1 14H6L5 6" /><path d="M10 11v6M14 11v6" /></svg>
-                        </button>
-                      </div>
+                      <RowActions itemName={getMedicineName(item)} onView={() => setViewingItem(item)} onEdit={() => handleEdit(item)} statusDisabled={true} onDelete={() => handleDispose(item)} />
                     </td>
                   </tr>
                 )) : (
@@ -336,3 +309,6 @@ export default function ExpiryAlerts() {
     </AdminLayout>
   )
 }
+
+
+

@@ -874,3 +874,97 @@ button.btn-secondary:hover {
   transition: background-color 5000s ease-in-out 0s;
 }
 
+
+/* Keep Create Pharmacist controls visible on the add/edit screen */
+.pharmacist-create-panel .branch-panel-heading {
+  align-items: center;
+}
+
+.pharmacist-header-submit {
+  flex: 0 0 auto;
+  min-width: 148px;
+  height: 38px;
+}
+
+.pharmacist-form-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  margin: 14px -16px -14px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 720px) {
+  .pharmacist-create-panel .branch-panel-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pharmacist-header-submit,
+  .pharmacist-form-actions .btn-primary,
+  .pharmacist-form-actions .btn-secondary {
+    width: 100%;
+  }
+
+  .pharmacist-form-actions {
+    flex-direction: column-reverse;
+  }
+}
+
+/* Pharmacist create page final layout: footer below fields, not covering data */
+.pharmacist-create-panel {
+  overflow: visible;
+}
+
+.pharmacist-create-panel .pharmacist-screen-form {
+  padding-bottom: 0;
+}
+
+.pharmacist-create-panel .pharmacist-form-actions {
+  position: static !important;
+  bottom: auto !important;
+  z-index: auto !important;
+  margin: 18px 0 0 !important;
+  padding: 14px 0 0 !important;
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+}
+
+.pharmacist-header-submit {
+  display: none !important;
+}
+
+
+/* Keep the create pharmacist form fully visible after adding Branch. */
+.pharmacist-create-panel {
+  width: min(100%, 1160px) !important;
+  max-width: 1160px !important;
+}
+
+.pharmacist-create-panel .pharmacist-form-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.pharmacist-create-panel .branch-panel-heading {
+  align-items: flex-start;
+}
+
+.pharmacist-create-panel .pharmacist-form-actions {
+  padding-top: 10px !important;
+  margin-top: 12px !important;
+}
+
+@media (max-width: 1180px) {
+  .pharmacist-create-panel .pharmacist-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .pharmacist-create-panel .pharmacist-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

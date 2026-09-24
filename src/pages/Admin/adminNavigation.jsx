@@ -10,8 +10,9 @@ const item = (label, path, iconName, color) => ({
 
 export const adminNavigation = [
   item('Dashboard', '/admin/dashboard', 'dashboard', 'blue'),
-  item('Users', '/admin/users', 'users', 'orange'),
+  item('Pharmacists', '/admin/users', 'users', 'orange'),
   item('Medicines', '/admin/medicines', 'medicines', 'emerald'),
+  item('Branches', '/admin/branches', 'branches', 'teal'),
   item('Stock', '/admin/stock', 'package', 'teal'),
   item('Suppliers', '/admin/suppliers', 'truck', 'amber'),
   item('Purchase Orders', '/admin/purchase-orders', 'shoppingCart', 'blue'),
@@ -21,5 +22,6 @@ export const adminNavigation = [
   item('Expiry Alerts', '/admin/expiry-alerts', 'triangleAlert', 'red'),
   item('Reports', '/admin/reports', 'barChart3', 'purple'),
   item('Settings', '/admin/settings', 'cog', 'cyan'),
-  item('CMS Integration', '/admin/cms-integration', 'globe', 'blue'),
 ]
+
+

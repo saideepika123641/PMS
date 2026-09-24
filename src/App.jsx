@@ -17,6 +17,7 @@ import SuperAdminProfile from './pages/Super Admin/SuperAdminProfile'
 import AdminDashboard from './pages/Admin/AdminDashboard'
 import AdminUsers from './pages/Admin/Users'
 import AdminMedicines from './pages/Admin/Medicines'
+import AdminBranches from './pages/Admin/Branches'
 import AdminStock from './pages/Admin/Stock'
 import AdminPrescriptions from './pages/Admin/Prescriptions'
 import AdminDispensing from './pages/Admin/Dispensing'
@@ -25,7 +26,6 @@ import AdminReports from './pages/Admin/Reports'
 import AdminSettings from './pages/Admin/Settings'
 import AdminSuppliers from './pages/Admin/Suppliers'
 import AdminPurchaseOrders from './pages/Admin/PurchaseOrders'
-import AdminCmsIntegration from './pages/Admin/CmsIntegration'
 import AdminStockTransfers from './pages/Admin/StockTransfers'
 import PharmacistDashboard from './pages/Pharmacist/Dashboard'
 import PharmacistPending from './pages/Pharmacist/Pending'
@@ -35,8 +35,13 @@ import PharmacistReturns from './pages/Pharmacist/Returns'
 import PharmacistReports from './pages/Pharmacist/Reports'
 import ToastProvider from './components/ToastProvider'
 import FormValidationGuard from './components/FormValidationGuard'
+import { hasPermission, readAdminPermissions } from './config/permissions'
 import './App.css'
 
+function AdminPermissionRoute({ module, children }) {
+  const permissions = readAdminPermissions()
+  return hasPermission(permissions, module, 'view') ? children : <Navigate to="/admin/dashboard" replace />
+}
 function App() {
   return (
     <ToastProvider>
@@ -54,6 +59,8 @@ function App() {
           <Route path="/super-admin/clinics" element={<Navigate to="/super-admin/branches" replace />} />
           <Route path="/super-admin/branches" element={<Branches />} />
           <Route path="/super-admin/users-permissions" element={<UsersPermissions />} />
+          <Route path="/super-admin/roles" element={<UsersPermissions />} />
+          <Route path="/superadmin/roles" element={<UsersPermissions />} />
           <Route path="/super-admin/medicines" element={<Medicines />} />
           <Route path="/super-admin/system-settings" element={<SystemSettings />} />
           <Route path="/superadmin/settings" element={<SystemSettings />} />
@@ -67,10 +74,11 @@ function App() {
           <Route path="/super-admin/change-password" element={<SuperAdminProfile initialTab="password" />} />
           <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/users" element={<AdminUsers />} />
-          <Route path="/admin/users/add" element={<AdminUsers initialAdd={true} />} />
-          <Route path="/admin/medicines" element={<AdminMedicines />} />
-          <Route path="/admin/stock" element={<AdminStock />} />
+          <Route path="/admin/users" element={<AdminPermissionRoute module="Users"><AdminUsers /></AdminPermissionRoute>} />
+          <Route path="/admin/users/add" element={<AdminPermissionRoute module="Users"><AdminUsers initialAdd={true} /></AdminPermissionRoute>} />
+          <Route path="/admin/medicines" element={<AdminPermissionRoute module="Medicines"><AdminMedicines /></AdminPermissionRoute>} />
+          <Route path="/admin/branches" element={<AdminPermissionRoute module="Branches"><AdminBranches /></AdminPermissionRoute>} />
+          <Route path="/admin/stock" element={<AdminPermissionRoute module="Stock"><AdminStock /></AdminPermissionRoute>} />
           <Route path="/inventory" element={<AdminStock initialView="inventory" />} />
           <Route path="/low-stock" element={<AdminStock initialView="low" />} />
           <Route path="/near-expiry" element={<AdminStock initialView="near" />} />
@@ -79,15 +87,14 @@ function App() {
           <Route path="/transactions" element={<AdminStock initialView="transactions" />} />
           <Route path="/valuation" element={<AdminStock initialView="valuation" />} />
           <Route path="/expired" element={<AdminStock initialView="expired" />} />
-          <Route path="/admin/suppliers" element={<AdminSuppliers />} />
-          <Route path="/admin/purchase-orders" element={<AdminPurchaseOrders />} />
-          <Route path="/admin/stock-transfers" element={<AdminStockTransfers />} />
-          <Route path="/admin/prescriptions" element={<AdminPrescriptions />} />
-          <Route path="/admin/dispensing" element={<AdminDispensing />} />
-          <Route path="/admin/expiry-alerts" element={<AdminExpiryAlerts />} />
-          <Route path="/admin/cms-integration" element={<AdminCmsIntegration />} />
-          <Route path="/admin/reports" element={<AdminReports />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/suppliers" element={<AdminPermissionRoute module="Suppliers"><AdminSuppliers /></AdminPermissionRoute>} />
+          <Route path="/admin/purchase-orders" element={<AdminPermissionRoute module="Purchase Orders"><AdminPurchaseOrders /></AdminPermissionRoute>} />
+          <Route path="/admin/stock-transfers" element={<AdminPermissionRoute module="Stock Transfers"><AdminStockTransfers /></AdminPermissionRoute>} />
+          <Route path="/admin/prescriptions" element={<AdminPermissionRoute module="Prescriptions"><AdminPrescriptions /></AdminPermissionRoute>} />
+          <Route path="/admin/dispensing" element={<AdminPermissionRoute module="Dispensing"><AdminDispensing /></AdminPermissionRoute>} />
+          <Route path="/admin/expiry-alerts" element={<AdminPermissionRoute module="Expiry Alerts"><AdminExpiryAlerts /></AdminPermissionRoute>} />
+          <Route path="/admin/reports" element={<AdminPermissionRoute module="Reports"><AdminReports /></AdminPermissionRoute>} />
+          <Route path="/admin/settings" element={<AdminPermissionRoute module="Settings"><AdminSettings /></AdminPermissionRoute>} />
           <Route path="/admin/profile" element={<SuperAdminProfile initialTab="profile" roleType="pharmacy-admin" />} />
           <Route path="/admin/change-password" element={<SuperAdminProfile initialTab="password" roleType="pharmacy-admin" />} />
           <Route path="/pharmacist/dashboard" element={<PharmacistDashboard />} />
@@ -109,3 +116,7 @@ function App() {
 }
 
 export default App
+
+
+
+

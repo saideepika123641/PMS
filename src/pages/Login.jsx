@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../components/AuthLayout'
 import { useToast } from '../components/ToastProvider'
-import { getPharmacistAssignmentStatus, getPharmacyAdminAssignmentStatus, loginUnifiedAuth } from '../config/api'
+import { getPharmacistAssignmentStatus, getPharmacyAdminAssignmentStatus, getPharmacyAdminAuthPermissions, loginUnifiedAuth } from '../config/api'
+import { permissionSource } from '../config/permissions'
 
 const loginFlows = [
   {
@@ -151,16 +152,34 @@ function Login() {
       if (!token) throw new Error('Login succeeded but token was not returned.')
 
       storage.setItem(flow.tokenKey, token)
-      storage.setItem(flow.userKey, JSON.stringify({ ...user, role: user?.role || flow.role }))
 
+      let storedUser = { ...user, role: user?.role || flow.role }
       if (flow.assignment) {
         try {
           const assignment = await flow.assignment()
-          storage.setItem(flow.assignmentKey, JSON.stringify(assignment?.data || assignment))
+          const assignmentData = assignment?.data || assignment
+          storage.setItem(flow.assignmentKey, JSON.stringify(assignmentData))
+          storedUser = { ...storedUser, ...assignmentData, role: storedUser.role }
         } catch {
           storage.removeItem(flow.assignmentKey)
         }
       }
+
+      if (flow.role === 'pharmacy-admin') {
+        try {
+          const permissionResponse = await getPharmacyAdminAuthPermissions()
+          const permissionData = permissionResponse?.data || permissionResponse || {}
+          const backendPermissions = permissionSource(permissionResponse) || permissionSource(permissionData)
+          storedUser = {
+            ...storedUser,
+            permissions: backendPermissions || storedUser.permissions,
+            modulePermissions: backendPermissions || storedUser.modulePermissions,
+            role: permissionData.role || permissionResponse?.role || storedUser.role,
+          }
+        } catch {}
+      }
+
+      storage.setItem(flow.userKey, JSON.stringify(storedUser))
 
       showToast('Welcome back to your dashboard.', 'success', response?.message || loginData?.message || 'Login successful')
       navigate(flow.dashboardPath, { replace: true })
@@ -201,3 +220,6 @@ function Login() {
 }
 
 export default Login
+
+
+

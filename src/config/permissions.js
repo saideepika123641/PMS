@@ -4,7 +4,19 @@ export const ADMIN_MODULES = ['Dashboard', 'Users', 'Medicines', 'Stock', 'Suppl
 
 export const MODULE_ALIASES = {
   Dashboard: ['dashboard'],
-  Users: ['users', 'user management', 'pharmacists', 'users permissions', 'users & permissions'],
+  Users: ['users', 'user management', 'pharmacists', 'pharmacist', 'users permissions', 'users & permissions'],
+  Pharmacists: ['pharmacists', 'pharmacist', 'users', 'user management'],
+  Branches: ['branches', 'clinics'],
+  Doctors: ['doctors'],
+  Receptionists: ['receptionists'],
+  Nurses: ['nurses'],
+  'Lab Technicians': ['lab technicians', 'lab technician'],
+  'Lab Files': ['lab files'],
+  Patients: ['patients'],
+  Appointments: ['appointments'],
+  'Schedule Settings': ['schedule settings', 'schedules'],
+  'Roles & Permissions': ['roles permissions', 'roles & permissions', 'users permissions', 'users & permissions'],
+  'User Management': ['user management', 'users'],
   Medicines: ['medicines', 'medicine'],
   Stock: ['stock', 'inventory'],
   Suppliers: ['suppliers'],
@@ -38,17 +50,21 @@ export function canonicalModule(rawModule, modules = ADMIN_MODULES) {
 export function normalizePermissions(source, modules = ADMIN_MODULES) {
   const result = emptyPermissions(modules)
   if (!source || typeof source !== 'object') return result
-  const entries = Array.isArray(source) ? source.map((item) => [item?.module || item?.name || item?.key, item]) : Object.entries(source)
+  const entries = Array.isArray(source) ? source.map((item) => [item?.module || item?.Module || item?.name || item?.Name || item?.key || item?.Key, item]) : Object.entries(source)
   entries.forEach(([rawModule, value]) => {
     const module = canonicalModule(rawModule, modules)
     if (!module) return
     if (Array.isArray(value)) {
       value.forEach((action) => {
-        const normalizedAction = String(action).toLowerCase()
+        const normalizedAction = String(action).toLowerCase().replace(/^can/, '')
         if (PERMISSION_ACTIONS.includes(normalizedAction)) result[module][normalizedAction] = true
       })
     } else if (value && typeof value === 'object') {
-      PERMISSION_ACTIONS.forEach((action) => { result[module][action] = boolPermission(value[action] ?? value[action === 'edit' ? 'update' : action]) })
+      PERMISSION_ACTIONS.forEach((action) => {
+        const apiKey = `can${action.charAt(0).toUpperCase()}${action.slice(1)}`
+        const pascalApiKey = `Can${action.charAt(0).toUpperCase()}${action.slice(1)}`
+        result[module][action] = boolPermission(value[action] ?? value[apiKey] ?? value[pascalApiKey] ?? value[action === 'edit' ? 'update' : action])
+      })
     } else if (boolPermission(value)) {
       PERMISSION_ACTIONS.forEach((action) => { result[module][action] = true })
     }
@@ -57,12 +73,44 @@ export function normalizePermissions(source, modules = ADMIN_MODULES) {
 }
 
 export function permissionSource(item) {
-  return item?.permissions || item?.modulePermissions || item?.permissionSet || item?.userPermissions || item?.role?.permissions
+  if (Array.isArray(item)) return item
+  if (Array.isArray(item?.data)) return item.data
+  return item?.permissions
+    || item?.Permissions
+    || item?.modulePermissions
+    || item?.ModulePermissions
+    || item?.permissionSet
+    || item?.PermissionSet
+    || item?.userPermissions
+    || item?.UserPermissions
+    || item?.role?.permissions
+    || item?.role?.Permissions
+    || item?.data?.permissions
+    || item?.data?.Permissions
+    || item?.data?.modulePermissions
+    || item?.data?.ModulePermissions
+    || item?.data?.role?.permissions
+    || item?.data?.role?.Permissions
 }
 
-export function serializePermissions(permissions) {
-  const normalized = normalizePermissions(permissions)
-  return { permissions: normalized, modulePermissions: Object.entries(normalized).map(([module, actions]) => ({ module, ...actions })) }
+function permissionRow(module, actions) {
+  return {
+    module,
+    view: actions.view,
+    create: actions.create,
+    edit: actions.edit,
+    delete: actions.delete,
+    canView: actions.view,
+    canCreate: actions.create,
+    canEdit: actions.edit,
+    canDelete: actions.delete,
+  }
+}
+
+export function serializePermissions(permissions, modules = ADMIN_MODULES) {
+  const normalized = normalizePermissions(permissions, modules)
+  const modulePermissions = Object.entries(normalized).map(([module, actions]) => permissionRow(module, actions))
+  return { permissions: normalized, modulePermissions }
 }
 
 export function hasPermission(permissions, module, action = 'view') {
@@ -85,3 +133,7 @@ export function readAdminPermissions() {
     return null
   }
 }
+
+
+
+
