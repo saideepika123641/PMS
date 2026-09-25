@@ -92,7 +92,7 @@
   stroke-width: 2.2;
 }
 
-.user-profile-dropdown {
+/* .user-profile-dropdown {
   position: absolute;
   right: 0;
   top: calc(100% + 16px);
@@ -286,4 +286,355 @@
     height: 58px;
     padding-right: 14px;
   }
+} */
+
+.user-profile-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 275px;
+  max-width: calc(100vw - 20px);
+  padding: 10px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1.5px solid #fecdd3;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.16);
+  z-index: 2000;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* ============================================================
+   PROFILE HEADER
+   ============================================================ */
+
+.hc-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: linear-gradient(
+    135deg,
+    #e6f7f5 0%,
+    #f0fdfa 100%
+  );
+  border: 1px solid rgba(20, 184, 166, 0.25);
+  border-radius: 14px;
+  margin-bottom: 8px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.hc-profile-header:hover {
+  background: linear-gradient(
+    135deg,
+    #d8f3ee 0%,
+    #e6fcf8 100%
+  );
+  border-color: rgba(20, 184, 166, 0.5);
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.16);
+  transform: translateY(-1px);
+}
+
+/* Profile avatar */
+
+.hc-profile-avatar-box {
+  position: relative;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+}
+
+.hc-profile-avatar-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    #0d9488 0%,
+    #0f766e 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 750;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 3px 10px rgba(15, 118, 110, 0.22);
+}
+
+/* Profile information */
+
+.hc-profile-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.hc-profile-name {
+  font-size: 13.5px;
+  font-weight: 750;
+  color: #082033;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hc-profile-email {
+  font-size: 11px;
+  color: #687895;
+  margin: 1px 0 3px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hc-profile-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 1.5px 7px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 999px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  line-height: 1.2;
+}
+
+/* ============================================================
+   MENU LIST
+   ============================================================ */
+
+.hc-dropdown-list {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Common menu item */
+
+.hc-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px 5px 6px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1.5px solid #fecdd3;
+  color: #0f172a;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.hc-dropdown-item:active {
+  transform: translateX(3px) scale(0.99);
+}
+
+/* ============================================================
+   MY PROFILE - PINK
+   ============================================================ */
+
+.hc-dropdown-item--pink {
+  background: #fff0f3;
+  border: 1.5px solid #fecdd3;
+  box-shadow: 0 3px 10px rgba(225, 29, 72, 0.06);
+}
+
+.hc-dropdown-item--pink:hover {
+  transform: translateX(4px);
+  background: #ffe4e6;
+  border-color: #fda4af;
+  box-shadow: 0 6px 18px rgba(225, 29, 72, 0.16);
+}
+
+/* ============================================================
+   CHANGE PASSWORD - ORANGE
+   ============================================================ */
+
+.hc-dropdown-item--orange {
+  background: linear-gradient(
+    90deg,
+    #ea580c 0%,
+    #f97316 60%,
+    #fb923c 100%
+  );
+  border: 1.5px solid #ea580c;
+  box-shadow: 0 8px 22px rgba(234, 88, 12, 0.38);
+  color: #ffffff;
+}
+
+.hc-dropdown-item--orange:hover {
+  transform: translateX(4px);
+  background: linear-gradient(
+    90deg,
+    #c2410c 0%,
+    #ea580c 60%,
+    #f97316 100%
+  );
+}
+
+/* ============================================================
+   LOGOUT - RED
+   ============================================================ */
+
+.hc-dropdown-item--danger {
+  background: linear-gradient(
+    90deg,
+    #be123c 0%,
+    #dc2626 60%,
+    #e11d48 100%
+  );
+  border: 1.5px solid #be123c;
+  box-shadow: 0 8px 22px rgba(190, 18, 60, 0.38);
+  color: #ffffff;
+}
+
+.hc-dropdown-item--danger:hover {
+  transform: translateX(4px);
+  background: linear-gradient(
+    90deg,
+    #991b1b 0%,
+    #be123c 60%,
+    #dc2626 100%
+  );
+}
+
+/* ============================================================
+   LEFT CIRCULAR ICON
+   ============================================================ */
+
+.hc-hero-circle-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #dbeafe;
+  border: 1px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 1px;
+}
+
+.hc-dropdown-item--pink .hc-hero-circle-badge {
+  background: #ffe4e6;
+  border-color: #fecdd3;
+  color: #e11d48;
+}
+
+.hc-dropdown-item--orange .hc-hero-circle-badge,
+.hc-dropdown-item--danger .hc-hero-circle-badge {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+}
+
+/* ============================================================
+   TITLE / SUBTITLE
+   ============================================================ */
+
+.hc-dropdown-item-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.hc-dropdown-item-title {
+  font-size: 12.5px;
+  font-weight: 750;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.hc-dropdown-item-subtitle {
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 1px;
+  line-height: 1.15;
+}
+
+/* Pink text */
+
+.hc-dropdown-item--pink .hc-dropdown-item-title {
+  color: #881337;
+}
+
+.hc-dropdown-item--pink .hc-dropdown-item-subtitle {
+  color: #9f1239;
+}
+
+/* Orange + Red text */
+
+.hc-dropdown-item--orange .hc-dropdown-item-title,
+.hc-dropdown-item--danger .hc-dropdown-item-title {
+  color: #ffffff;
+}
+
+.hc-dropdown-item--orange .hc-dropdown-item-subtitle,
+.hc-dropdown-item--danger .hc-dropdown-item-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ============================================================
+   RIGHT BADGES
+   ============================================================ */
+
+.hc-pill-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  margin-left: auto;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* ONLINE */
+
+.hc-pill-tag--pink {
+  border: 1.5px solid #fda4af;
+  background: #ffe4e6;
+  color: #e11d48;
+}
+
+/* SECURITY + EXIT */
+
+.hc-pill-tag--white {
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
 }

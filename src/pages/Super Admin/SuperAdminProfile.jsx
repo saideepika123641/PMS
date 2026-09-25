@@ -4,10 +4,26 @@ import { useToast } from '../../components/ToastProvider'
 import { changePharmacyAdminPassword, changeSignedInPharmacistPassword, changeSuperAdminPassword, getSuperAdminProfile } from '../../config/api'
 import SuperAdminSidebar from './SuperAdminSidebar'
 import SuperAdminTopbar from './SuperAdminTopbar'
+import AdminSidebar from '../Admin/AdminSidebar'
 import PharmacistSidebar from '../Pharmacist/PharmacistSidebar'
 import UserProfileMenu from '../../components/UserProfileMenu'
 import './SuperAdminTopbar.css'
 import './SuperAdminProfile.css'
+
+import {
+  LuActivity,
+  LuArrowLeft,
+  LuBell,
+  LuCircle,
+  LuEyeOff,
+  LuKeyRound,
+  LuLock,
+  LuLogOut,
+  LuMail,
+  LuShieldCheck,
+  LuStethoscope,
+  LuUserRound,
+} from 'react-icons/lu'
 
 function Icon({ children }) {
   return <svg className="profile-topbar-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{children}</svg>
@@ -121,240 +137,256 @@ export default function SuperAdminProfile({ initialTab = 'profile', roleType = '
     navigate('/login')
   }
 
+  // return (
+  //   <div className={`profile-page${isPharmacyAdmin || isPharmacist ? ' profile-admin-shell' : ' profile-super-admin-shell'}${sidebarOpen ? ' sidebar-open' : ''}`}>
+  //     {isPharmacyAdmin || isPharmacist ? (
+  //       <aside className="profile-sidebar">
+  //         <div className="profile-brand">
+  //           <b>+</b>
+  //           <div>
+  //             <strong>PMS</strong>
+  //             <small>{roleLabel} Console</small>
+  //           </div>
+  //         </div>
+  //         <nav className="profile-side-nav">
+  //           <button type="button" className={tab === 'profile' ? 'active' : ''} onClick={() => { setTab('profile'); navigate(profilePath) }}>
+  //             <LuUserRound size={18} />
+  //             <span>My Profile</span>
+  //           </button>
+  //           <button type="button" className={tab === 'password' ? 'active' : ''} onClick={() => { setTab('password'); navigate(passwordPath) }}>
+  //             <LuLock size={18} />
+  //             <span>Change Password</span>
+  //           </button>
+  //           <button type="button" className="danger-text" onClick={logout}>
+  //             <LuLogOut size={18} />
+  //             <span>Logout</span>
+  //           </button>
+  //         </nav>
+  //         <div className="sidebar-user-card">
+  //           <div className="sidebar-user-avatar-wrap">
+  //             <span className="sidebar-user-avatar">{initials}</span>
+  //             <span className="sidebar-user-status-dot" />
+  //           </div>
+  //           <strong>{name}</strong>
+  //           <small>{roleLabel}</small>
+  //           <span className="status-text">🟢 Online</span>
+  //         </div>
+  //       </aside>
+  //     ) : (
+  //       <SuperAdminSidebar activeLabel="" />
+  //     )}
   return (
-    <div className={`profile-page${isPharmacyAdmin || isPharmacist ? ' profile-admin-shell' : ' profile-super-admin-shell'}${sidebarOpen ? ' sidebar-open' : ''}`}>
-      {isPharmacyAdmin || isPharmacist ? (
-        <aside className="profile-sidebar">
-          <div className="profile-brand">
-            <b>+</b>
-            <div>
-              <strong>PMS</strong>
-              <small>{roleLabel} Console</small>
-            </div>
-          </div>
-          <nav className="profile-side-nav">
-            <button
-              type="button"
-              className={tab === 'profile' ? 'active' : ''}
-              onClick={() => { setTab('profile'); navigate(profilePath) }}
-            >
-              <svg className="sidebar-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>My Profile</span>
-            </button>
-            <button
-              type="button"
-              className={tab === 'password' ? 'active' : ''}
-              onClick={() => { setTab('password'); navigate(passwordPath) }}
-            >
-              <svg className="sidebar-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span>Change Password</span>
-            </button>
-            <button type="button" className="danger-text" onClick={logout}>
-              <svg className="sidebar-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              <span>Logout</span>
-            </button>
-          </nav>
-          <div className="sidebar-user-card">
-            <div className="sidebar-user-avatar-wrap">
-              <span className="sidebar-user-avatar">{initials}</span>
-              <span className="sidebar-user-status-dot" />
-            </div>
-            <strong>{name}</strong>
-            <small>{roleLabel}</small>
-            <span className="status-text">🟢 Online</span>
-          </div>
-        </aside>
+    <div className={`profile-page profile-super-admin-shell${sidebarOpen ? ' sidebar-open' : ''}`}>
+
+      {isPharmacist ? (
+        <PharmacistSidebar activeLabel="" />
+      ) : isPharmacyAdmin ? (
+        <AdminSidebar activeLabel="" />
       ) : (
         <SuperAdminSidebar activeLabel="" />
       )}
+
       <main className="profile-main">
         {isPharmacyAdmin || isPharmacist ? (
           <header className="profile-topbar">
-            <label className="profile-search"><Icon><circle cx="11" cy="11" r="6" /><path d="m16 16 4 4" /></Icon><input placeholder={isPharmacist ? "Search dashboard, pending, dispensing, reports..." : "Search dashboard, branches, admins, reports..."} /></label>
+            <label className="profile-search">
+              <LuUserRound size={18} />
+              <input placeholder={isPharmacist ? 'Search dashboard, pending, dispensing, reports...' : 'Search dashboard, branches, admins, reports...'} />
+            </label>
+            {/* <button className="profile-bell" type="button" onClick={() => navigate(isPharmacist ? '/pharmacist/dashboard' : '/admin/expiry-alerts')} aria-label="View notifications">
+              <span aria-hidden="true">♧</span>
+            </button> */}
             <button
-              className="profile-bell"
-              type="button"
-              onClick={() => navigate(isPharmacist ? '/pharmacist/dashboard' : '/admin/expiry-alerts')}
-              aria-label="View notifications"
-            >
-              <Icon><path d="M6 9a6 6 0 0 1 12 0c0 7 2 7 2 9H4c0-2 2-2-2-9" /><path d="M10 21h4" /></Icon>
-            </button>
+  className="profile-bell"
+  type="button"
+  onClick={() => navigate(isPharmacist ? '/pharmacist/dashboard' : '/admin/expiry-alerts')}
+  aria-label="View notifications"
+>
+  <LuBell size={21} strokeWidth={1.8} />
+</button>
             <UserProfileMenu roleType={roleType} />
           </header>
         ) : (
           <SuperAdminTopbar onMenu={() => setSidebarOpen((value) => !value)} />
         )}
+
+        {/* CMS PROFILE UI - layout only. Existing routes/APIs/password logic remain unchanged. */}
         <div className="profile-content-wrap">
-          <section className={isPharmacyAdmin || isPharmacist ? "profile-hero" : "profile-hero super-admin-hero"}>
-            <button className="profile-back" type="button" onClick={() => navigate(isPharmacist ? '/pharmacist/dashboard' : isPharmacyAdmin ? '/admin/dashboard' : '/super-admin/dashboard')}>Back</button>
-            {isPharmacyAdmin || isPharmacist ? (
-              <>
-                <span className="profile-hero-avatar">{initials}</span>
-                <div className="profile-hero-copy">
-                  <h1>{name}</h1>
-                  <p>{email}</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <span>{initials}</span>
-                <div>
-                  <h1>{name}</h1>
-                  <p>{email}</p>
-                </div>
-              </>
-            )}
+          <section className="profile-hero">
+            <button type="button" className="profile-back-btn" onClick={() => navigate(isPharmacist ? '/pharmacist/dashboard' : isPharmacyAdmin ? '/admin/dashboard' : '/super-admin/dashboard')} aria-label="Go back" title="Return to previous screen">
+              <LuArrowLeft size={16} />
+              <span>Back</span>
+            </button>
+
+            <div className="profile-hero-avatar-wrap">
+              <div className="profile-hero-avatar">{initials}</div>
+              <span className="profile-hero-role-badge">
+                <LuActivity size={12} />
+              </span>
+            </div>
+
+            <div className="profile-hero-info">
+              <div className="profile-hero-top-tag">
+                <span className="profile-med-cross-tag">
+                  <LuShieldCheck size={12} />
+                  Hospital Staff Profile
+                </span>
+                <span className="profile-station-status">
+                  <span className="status-pulse-dot" />
+                  Station Active
+                </span>
+              </div>
+              <h2>{name}</h2>
+              <p className="profile-hero-email">
+                <LuMail size={13} />
+                {email}
+              </p>
+            </div>
+
+            <div className="profile-hero-ecg" aria-hidden="true">
+              <svg viewBox="0 0 200 24" className="profile-ecg-svg" preserveAspectRatio="none">
+                <path d="M0,12 L45,12 L52,12 L58,3 L64,19 L70,5 L76,14 L82,12 L138,12 L144,3 L150,19 L156,6 L162,14 L168,12 L200,12" fill="none" stroke="rgba(13, 148, 136, 0.45)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                <circle cx="82" cy="12" r="2.5" fill="#0d9488" className="profile-ecg-runner" />
+              </svg>
+            </div>
           </section>
-          <section className={`profile-panel${isPharmacyAdmin || isPharmacist ? ' profile-panel-full' : ''}`}>
-            {!(isPharmacyAdmin || isPharmacist) && (
-              <nav className="profile-tabs">
-                <button className={tab === 'profile' ? 'active' : ''} onClick={() => { setTab('profile'); navigate(profilePath) }} type="button">My Profile</button>
-                <button className={tab === 'password' ? 'active' : ''} onClick={() => { setTab('password'); navigate(passwordPath) }} type="button">Change Password</button>
-                <button className="danger" onClick={logout} type="button">Logout</button>
-              </nav>
-            )}
-            {tab === 'profile' ? (
-              isPharmacyAdmin || isPharmacist ? (
-                <div className="profile-details-modern">
-                  <h2>My Profile</h2>
-                  <div className="profile-detail-grid">
-                    <article className="profile-detail-card email-card">
-                      <div className="profile-card-icon-wrap">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+
+          <div className="profile-layout">
+            <aside className="profile-tabs">
+              <div className="profile-tabs-header">
+                <LuActivity size={14} />
+                <span>Staff Controls</span>
+              </div>
+
+              <button type="button" className={`profile-tab-btn ${tab === 'profile' ? 'active' : ''}`} onClick={() => { setTab('profile'); navigate(profilePath) }} title="View staff medical profile">
+                <LuStethoscope size={18} />
+                <span className="profile-tab-text">
+                  <strong>My Profile</strong>
+                  <small>Clinical ID &amp; Credentials</small>
+                </span>
+                {tab === 'profile' ? <span className="profile-tab-indicator" /> : null}
+              </button>
+
+              <button type="button" className={`profile-tab-btn ${tab === 'password' ? 'active' : ''}`} onClick={() => { setTab('password'); navigate(passwordPath) }} title="Update access password">
+                <LuKeyRound size={18} />
+                <span className="profile-tab-text">
+                  <strong>Change Password</strong>
+                  <small>Security &amp; HIPAA Vault</small>
+                </span>
+                {tab === 'password' ? <span className="profile-tab-indicator" /> : null}
+              </button>
+
+              <button type="button" className="profile-tab-btn danger" onClick={logout} title="End current clinical session">
+                <LuLogOut size={18} />
+                <span className="profile-tab-text">
+                  <strong>Logout</strong>
+                  <small>End Hospital Session</small>
+                </span>
+              </button>
+            </aside>
+
+            <div className="profile-panel">
+              {tab === 'profile' ? (
+                <div className="profile-view-screen">
+                  <div className="profile-panel-header">
+                    <div className="profile-panel-title-wrap">
+                      <div className="profile-panel-icon-badge">
+                        <LuStethoscope size={20} />
                       </div>
-                      <div className="profile-card-text">
-                        <small>Email</small>
-                        <strong>{email}</strong>
+                      <div>
+                        <h3>Staff Medical Credentials</h3>
+                        <p>Verified hospital profile and station assignments</p>
                       </div>
-                    </article>
-                    <article className="profile-detail-card role-card">
-                      <div className="profile-card-icon-wrap">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                      </div>
-                      <div className="profile-card-text">
-                        <small>Role</small>
-                        <strong>{roleLabel}</strong>
-                      </div>
-                    </article>
-                    <article className="profile-detail-card name-card">
-                      <div className="profile-card-icon-wrap">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                      </div>
-                      <div className="profile-card-text">
-                        <small>Name</small>
-                        <strong>{name}</strong>
-                      </div>
-                    </article>
+                    </div>
+                    <span className="profile-verified-badge">
+                      <LuShieldCheck size={13} />
+                      Verified Staff
+                    </span>
                   </div>
 
-                  <div className="profile-quick-actions-wrap">
-                    <h3>Quick Actions</h3>
-                    <div className="profile-actions-grid">
-                      <button 
-                        type="button" 
-                        className="profile-action-card dashboard-act"
-                        onClick={() => navigate(isPharmacist ? '/pharmacist/dashboard' : '/admin/dashboard')}
-                      >
-                        <div className="profile-action-icon">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                        </div>
-                        <div className="profile-action-info">
-                          <strong>View Dashboard</strong>
-                          <small>Go to main dashboard</small>
-                        </div>
-                      </button>
-                      <button 
-                        type="button" 
-                        className="profile-action-card password-act"
-                        onClick={() => { setTab('password'); navigate(passwordPath) }}
-                      >
-                        <div className="profile-action-icon">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        </div>
-                        <div className="profile-action-info">
-                          <strong>Change Password</strong>
-                          <small>Update your password</small>
-                        </div>
-                      </button>
-                      <button 
-                        type="button" 
-                        className="profile-action-card logout-act"
-                        onClick={logout}
-                      >
-                        <div className="profile-action-icon">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        </div>
-                        <div className="profile-action-info">
-                          <strong>Logout</strong>
-                          <small>Sign out from account</small>
-                        </div>
-                      </button>
+                  <div className="profile-info-grid">
+                    <div className="profile-info-card card--email">
+                      <div className="profile-card-instrument-badge"><LuMail size={22} /></div>
+                      <div className="profile-card-content">
+                        <span className="profile-card-label">Official Email</span>
+                        <strong className="profile-card-value">{email}</strong>
+                        <em className="profile-card-subtag">Primary Communication Channel</em>
+                      </div>
+                    </div>
+
+                    <div className="profile-info-card card--role">
+                      <div className="profile-card-instrument-badge"><LuShieldCheck size={22} /></div>
+                      <div className="profile-card-content">
+                        <span className="profile-card-label">Clinical Role</span>
+                        <strong className="profile-card-value">{roleLabel}</strong>
+                        <em className="profile-card-subtag">Authorized Medical Access</em>
+                      </div>
+                    </div>
+
+                    <div className="profile-info-card card--name">
+                      <div className="profile-card-instrument-badge"><LuUserRound size={22} /></div>
+                      <div className="profile-card-content">
+                        <span className="profile-card-label">Staff Full Name</span>
+                        <strong className="profile-card-value">{name}</strong>
+                        <em className="profile-card-subtag">Licensed Healthcare Personnel</em>
+                      </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="profile-details">
-                  <h2>My Profile</h2>
-                  <div className="profile-detail-grid">
-                    <article><b>@</b><small>Email</small><strong>{email}</strong></article>
-                    <article><b>#</b><small>Role</small><strong>{roleLabel}</strong></article>
-                    <article><b>ID</b><small>Name</small><strong>{name}</strong></article>
+                <form onSubmit={updatePassword} noValidate className="profile-form-hospital">
+                  <div className="profile-panel-header">
+                    <div className="profile-panel-title-wrap">
+                      <div className="profile-panel-icon-badge badge--security"><LuKeyRound size={20} /></div>
+                      <div>
+                        <h3>Hospital Security Credentials</h3>
+                        <p>Update access key with HIPAA &amp; NABH compliant standards</p>
+                      </div>
+                    </div>
+                    <span className="profile-security-badge"><LuShieldCheck size={13} /> Encrypted Hospital Vault</span>
                   </div>
-                </div>
-              )
-            ) : (
-              <form className="password-form" onSubmit={updatePassword}>
-                <h2>Change Password</h2>
-                <label>
-                  Current Password
-                  <input 
-                    type="password" 
-                    value={form.currentPassword} 
-                    onChange={(event) => setForm({ ...form, currentPassword: event.target.value })} 
-                    style={{
-                      borderColor: submitted && errors.currentPassword ? '#ef4444' : '',
-                      backgroundColor: submitted && errors.currentPassword ? '#fff5f5' : ''
-                    }}
-                  />
-                  {submitted && errors.currentPassword && <span className="field-error-msg">{errors.currentPassword}</span>}
-                </label>
-                <label>
-                  New Password
-                  <input 
-                    type="password" 
-                    value={form.newPassword} 
-                    onChange={(event) => setForm({ ...form, newPassword: event.target.value })} 
-                    style={{
-                      borderColor: submitted && errors.newPassword ? '#ef4444' : '',
-                      backgroundColor: submitted && errors.newPassword ? '#fff5f5' : ''
-                    }}
-                  />
-                  {submitted && errors.newPassword && <span className="field-error-msg">{errors.newPassword}</span>}
-                </label>
-                <ul>
-                  <li>Minimum 8 characters</li>
-                  <li>At least 1 uppercase letter (A-Z)</li>
-                  <li>At least 1 lowercase letter (a-z)</li>
-                  <li>At least 1 number (0-9)</li>
-                  <li>At least 1 special character (@, #, $, %, etc.)</li>
-                </ul>
-                <label>
-                  Confirm Password
-                  <input 
-                    type="password" 
-                    value={form.confirmPassword} 
-                    onChange={(event) => setForm({ ...form, confirmPassword: event.target.value })} 
-                    style={{
-                      borderColor: submitted && errors.confirmPassword ? '#ef4444' : '',
-                      backgroundColor: submitted && errors.confirmPassword ? '#fff5f5' : ''
-                    }}
-                  />
-                  {submitted && errors.confirmPassword && <span className="field-error-msg">{errors.confirmPassword}</span>}
-                </label>
-                <button type="submit">Update Password</button>
-              </form>
-            )}
-          </section>
+
+                  <label className="profile-field-label">
+                    <span className="field-label-text"><LuKeyRound size={14} className="field-label-icon" /> Current Password</span>
+                    <div className="profile-password-field">
+                      <input type="password" value={form.currentPassword} minLength={8} required placeholder="Enter current password..." autoComplete="current-password" onChange={(event) => setForm({ ...form, currentPassword: event.target.value })} />
+                      <span className="profile-password-toggle profile-lens-toggle" aria-hidden="true"><span className="profile-lens-rim"><LuEyeOff size={17} /></span></span>
+                    </div>
+                    {submitted && errors.currentPassword ? <span className="field-error-msg">{errors.currentPassword}</span> : null}
+                  </label>
+
+                  <label className="profile-field-label">
+                    <span className="field-label-text"><LuKeyRound size={14} className="field-label-icon" /> New Password</span>
+                    <div className="profile-password-field">
+                      <input type="password" value={form.newPassword} minLength={8} required placeholder="Enter strong new password..." autoComplete="new-password" onChange={(event) => setForm({ ...form, newPassword: event.target.value })} />
+                      <span className="profile-password-toggle profile-lens-toggle" aria-hidden="true"><span className="profile-lens-rim"><LuEyeOff size={17} /></span></span>
+                    </div>
+                    <ul className="profile-password-requirements" aria-label="Password requirements">
+                      <li><span className="requirement-vital-indicator"><LuCircle size={15} /></span><span>Minimum 8 characters</span></li>
+                      <li><span className="requirement-vital-indicator"><LuCircle size={15} /></span><span>At least 1 uppercase letter (A-Z)</span></li>
+                      <li><span className="requirement-vital-indicator"><LuCircle size={15} /></span><span>At least 1 lowercase letter (a-z)</span></li>
+                      <li><span className="requirement-vital-indicator"><LuCircle size={15} /></span><span>At least 1 number (0-9)</span></li>
+                      <li><span className="requirement-vital-indicator"><LuCircle size={15} /></span><span>At least 1 special character (@, #, $, %, etc.)</span></li>
+                    </ul>
+                  </label>
+
+                  <label className="profile-field-label">
+                    <span className="field-label-text"><LuKeyRound size={14} className="field-label-icon" /> Confirm Password</span>
+                    <div className="profile-password-field">
+                      <input type="password" value={form.confirmPassword} minLength={8} required placeholder="Confirm new password..." autoComplete="new-password" onChange={(event) => setForm({ ...form, confirmPassword: event.target.value })} />
+                      <span className="profile-password-toggle profile-lens-toggle" aria-hidden="true"><span className="profile-lens-rim"><LuEyeOff size={17} /></span></span>
+                    </div>
+                    {submitted && errors.confirmPassword ? <span className="field-error-msg">{errors.confirmPassword}</span> : null}
+                  </label>
+
+                  <div className="profile-form-actions">
+                    <button type="button" className="profile-cancel-btn">Cancel</button>
+                    <button type="submit" className="profile-save" title="Update Password"><LuLock size={16} /><span>Update Password</span></button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
         </div>
       </main>
     </div>

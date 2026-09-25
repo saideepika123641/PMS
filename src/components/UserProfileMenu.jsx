@@ -146,7 +146,7 @@ function UserProfileMenu({ roleType = 'pharmacy-admin' }) {
         <MenuIcon name="chevronDown" size={18} className="user-profile-chevron" />
       </button>
 
-      {open ? (
+      {/* {open ? (
         <div className="user-profile-dropdown">
           <div className="user-profile-head">
             <span className="user-profile-head-avatar">{initials(profile.name || profile.email)}</span>
@@ -172,7 +172,128 @@ function UserProfileMenu({ roleType = 'pharmacy-admin' }) {
             <span className="user-profile-menu-copy"><b>Logout</b><small>Sign out from your account</small></span>
           </button>
         </div>
-      ) : null}
+      ) : null} */}
+
+
+      {open ? (
+  <div
+    className="user-profile-dropdown hc-pms-profile-dropdown"
+    role="menu"
+    aria-label="User Profile Menu"
+  >
+    {/* Profile Header - UI only */}
+    <button
+      type="button"
+      className="hc-profile-header"
+      onClick={() => goTo(profile.profilePath)}
+      title="View Profile"
+    >
+      <span className="hc-profile-avatar-box">
+        <span className="hc-profile-avatar-circle">
+          {initials(profile.name || profile.email)}
+        </span>
+      </span>
+
+      <span className="hc-profile-info">
+        <strong className="hc-profile-name">
+          {profile.name}
+        </strong>
+
+        <span className="hc-profile-email">
+          {profile.email}
+        </span>
+
+        <span className="hc-profile-badge">
+          {profile.roleLabel}
+        </span>
+      </span>
+    </button>
+
+    {/* CMS-style menu items */}
+    <div className="hc-dropdown-list">
+
+      {/* My Profile */}
+      <button
+        type="button"
+        role="menuitem"
+        className="hc-dropdown-item hc-dropdown-item--pink"
+        onClick={() => goTo(profile.profilePath)}
+      >
+        <span className="hc-hero-circle-badge">
+          <MenuIcon name="user" size={15} />
+        </span>
+
+        <span className="hc-dropdown-item-content">
+          <span className="hc-dropdown-item-title">
+            My Profile
+          </span>
+
+          <span className="hc-dropdown-item-subtitle">
+            View and edit your profile
+          </span>
+        </span>
+
+        <span className="hc-pill-tag hc-pill-tag--pink">
+          ONLINE
+        </span>
+      </button>
+
+      {/* Change Password */}
+      <button
+        type="button"
+        role="menuitem"
+        className="hc-dropdown-item hc-dropdown-item--orange"
+        onClick={() => goTo(profile.passwordPath)}
+      >
+        <span className="hc-hero-circle-badge">
+          <MenuIcon name="key" size={15} />
+        </span>
+
+        <span className="hc-dropdown-item-content">
+          <span className="hc-dropdown-item-title">
+            Change Password
+          </span>
+
+          <span className="hc-dropdown-item-subtitle">
+            Update your password
+          </span>
+        </span>
+
+        <span className="hc-pill-tag hc-pill-tag--white">
+          SECURITY
+        </span>
+      </button>
+
+      {/* Logout */}
+      <button
+        type="button"
+        role="menuitem"
+        className="hc-dropdown-item hc-dropdown-item--danger"
+        onClick={logout}
+      >
+        <span className="hc-hero-circle-badge">
+          <MenuIcon name="logout" size={15} />
+        </span>
+
+        <span className="hc-dropdown-item-content">
+          <span className="hc-dropdown-item-title">
+            Logout
+          </span>
+
+          <span className="hc-dropdown-item-subtitle">
+            Sign out from your account
+          </span>
+        </span>
+
+        <span className="hc-pill-tag hc-pill-tag--white">
+          EXIT
+        </span>
+      </button>
+
+    </div>
+  </div>
+) : null}
+
     </div>
   )
 }
